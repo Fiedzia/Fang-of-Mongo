@@ -1,0 +1,7 @@
+Fang of Mongo - web based user interface for MongoDB build with django and jquery.
+
+For installation instruction, see INSTALL file
+To get the idea of code internals, see code_hacking.txt
+
+
+author: Maciej Dziardziel (maciejdziardziel@wp.pl)
