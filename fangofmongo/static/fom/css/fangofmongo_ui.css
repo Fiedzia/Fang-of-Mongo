@@ -1,0 +1,17 @@
+body { font-size: 62.5%; }
+label, input { display:block; }
+input.text { margin-bottom:12px; width:95%; padding: .4em; border-color: silver; }
+fieldset { padding:0; border:0; margin-top:25px; }
+h1 { font-size: 1.2em; margin: .6em 0; }
+.ui-button { outline: 0; margin:0; padding: .4em 1em .5em; text-decoration:none;  !important; cursor:pointer; position: relative; text-align: center; }
+.ui-dialog .ui-state-highlight, .ui-dialog .ui-state-error { padding: .3em;  }
+
+#mongo_ui_header { color: white; background-color: orange; font-size: 20pt; }
+#mongo_ui_header_tools > div { display: inline; font-size: 10pt; color: white; background-color: darkorange; }
+#mongo_ui_header_tools > div :hover { color: red; font-size: 30pt; } 
+
+#fom_console_input { width: 80%;}
+
+#fom_dialog_db > div, #fom_dialog_coll > div  { font-size: 12pt; border: 4px; padding: 8px;}
+#fom_dialog_db > div :hover, #fom_dialog_coll > div :hover { background-color:orange; }
+

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+{{ block.super }}
+<title>Fang of Mongo: MongoDB  web interface</title>
+<meta name="keywords" content="fang of mongo, fangofmongo, mongo, mongodb, django"/>
+<meta name="author" content="maciej dziardziel (maciejdziardziel@wp.pl"/>
+
+{% endblock meta %}
+{% block js %}
+{{ block.super }}
+<script src="/static/contrib/jquery/jquery-1.3.2.min.js"></script>
+<script src="/static/contrib/jquery-ui/js/jquery-ui-1.7.2.custom.min.js"></script>
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link rel=stylesheet href="/static/contrib/jquery-ui/css/ui-lightness/jquery-ui-1.7.2.custom.css" type="text/css"/>
+{% endblock %}
+
+{% block content %}
+
+<div id='errormsg'>
+<p>
+If you see this mesage, then either you have javascript disabled, or something else went wrong.<br/>
+Please turn js on and refresh this page.
+</p>
+</div>
+
+{% endblock content %}

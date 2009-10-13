@@ -1,0 +1,17 @@
+{% extends 'base2.html' %}
+
+{% block js %}
+{{ block.super }}
+<script src="/static/fom/js/fangofmongo_login.js"></script>
+<script> try { fom_init_login_form(); }catch(e){ alert(e);};  </script>
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link rel=stylesheet href="/static/fom/css/fangofmongo_login.css" type="text/css"/>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+{% include 'fom/templates/start_form.html' %}
+{% endblock content %}

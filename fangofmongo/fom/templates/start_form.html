@@ -1,0 +1,31 @@
+<div id="start_dialog" title="Welcome to Fang of Mongo">
+    <p id="validateTips">
+    <b>Fang of Mongo</b> is a dead simple web interface to <a href="http://www.mongodb.org">Mongo</a> database,<br/>
+    written in <a href="http://www.djangoproject.com/">Django</a> by Maciej Dziardziel (<a href="mailto:maciejdziardziel@wp.pl">maciejdziardziel@wp.pl</a>).<br/>
+    You will need modern webbrowser to use it. I hope you will find it usefull.
+    </p> 
+ 
+    <form> 
+    <fieldset> 
+        <!--<label for="db_engine">Engine</label> 
+        <select name="db_engine" id="db_engine">
+            <option value="mongo">Mongo</option>
+        </select>-->
+        <label for="db_host">Host</label> 
+        <input type="text" name="db_host" id="db_host" value="localhost" class="text ui-widget-content ui-corner-all" /> 
+        <label for="db_port">Port</label> 
+        <input type="text" name="db_port" id="db_port" value="27017" class="text ui-widget-content ui-corner-all" />
+
+
+        <label for="db_login">Login</label> 
+        <input type="test" name="db_login" id="db_login" value="" class="text ui-widget-content ui-corner-all" /> 
+
+
+        <label for="db_password">Password</label> 
+        <input type="password" name="db_password" id="db_password" value="" class="text ui-widget-content ui-corner-all" /> 
+    </fieldset> 
+    </form>
+    <p>
+        For connecting with default Mongo installation, just click the button.
+    </p>
+</div> 
