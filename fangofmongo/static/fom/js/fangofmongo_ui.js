@@ -7,11 +7,62 @@ function fom_init_mongo_ui()
 */
 {
     $(function() {
+
+
+$.widget("ui.fom_object", {
+   _init: function() {
+     // init code for mywidget
+     // can use this.options
+     if (this.options.hidden) {
+       // and this.element
+       this.listeners = new Array();
+       alert('root init');
+     }
+   },
+   add_listener: function(listener) {
+      // internal functions should be named begin with an underscore
+      // manipulate the widget
+   },
+
+   del_listener: function(listener) {
+      // internal functions should be named begin with an underscore
+      // manipulate the widget
+   },
+   signal: function(signal_name, signal_source, ) {
+    this.signals[this.signals.length] = signal_name;
+   },
+
+   destroy: function() {
+       $.widget.prototype.apply(this, arguments); // default destroy
+        // now do other stuff particular to this widget
+   }
+ });
+
+ $.extend($.ui.fom_object, {
+//   getter: "value length",
+   defaults: {
+     option1: "defaultValue",
+     hidden: true
+   }
+ });
+
+
+
+
+
+try {
+$('#mongo_ui_container').fom_object();
+$('#mongo_ui_container').fom_object('signal', 's');
+
+
+} catch(e) { alert(e);};
+
+
  
         //function updateTips(t) {
         //    tips.text(t).effect("highlight",{},1500);
         //}
-
+/*
 
      //fom_dialog_db - database list
      $("#fom_dialog_db").dialog({
@@ -63,8 +114,8 @@ function fom_init_mongo_ui()
      fom_load_db();
 
      $('#errormsg').hide();
-
-    });
+*/
+    }); //end of function
 
 
 
