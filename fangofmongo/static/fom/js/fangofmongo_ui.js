@@ -3,7 +3,7 @@
 
 function fom_init_mongo_ui()
 /*
-    Define and show dialogs
+    Base class for fom gui objects
 */
 {
     $(function() {
@@ -13,23 +13,27 @@ $.widget("ui.fom_object", {
    _init: function() {
      // init code for mywidget
      // can use this.options
-     if (this.options.hidden) {
-       // and this.element
-       this.listeners = new Array();
-       alert('root init');
-     }
+     this.listeners = new Array();
+     this.active = false;
+     alert('root init');
    },
+//   value: function(a) { return a; },
+   length: function ( ) { return this.listeners.length;  },
+   active:  function ( ) { return this.active;  },
    add_listener: function(listener) {
-      // internal functions should be named begin with an underscore
-      // manipulate the widget
+      this.listeners[this.listeners.length] = listener;
    },
 
    del_listener: function(listener) {
       // internal functions should be named begin with an underscore
       // manipulate the widget
+      for(var i = this.listeners.length; i>=0; i++)
+      {
+        if (this.listeners[i] == listener) this.listeners.splice(i, 1);
+      }
    },
-   signal: function(signal_name, signal_source, ) {
-    this.signals[this.signals.length] = signal_name;
+   signal: function(signal_name, signal_source, signal_data ) {
+    //this.signal[this.signals.length] = signal_name;
    },
 
    destroy: function() {
@@ -38,10 +42,11 @@ $.widget("ui.fom_object", {
    }
  });
 
+
  $.extend($.ui.fom_object, {
-//   getter: "value length",
+   getters: "value length",
    defaults: {
-     option1: "defaultValue",
+     active: false,
      hidden: true
    }
  });
@@ -49,19 +54,11 @@ $.widget("ui.fom_object", {
 
 
 
-
-try {
 $('#mongo_ui_container').fom_object();
 $('#mongo_ui_container').fom_object('signal', 's');
 
 
-} catch(e) { alert(e);};
-
-
  
-        //function updateTips(t) {
-        //    tips.text(t).effect("highlight",{},1500);
-        //}
 /*
 
      //fom_dialog_db - database list
@@ -119,66 +116,72 @@ $('#mongo_ui_container').fom_object('signal', 's');
 
 
 
+    /*
+        DATABASE ACCESS
+    */
+    $(function() {
+    $.widget("ui.fom_object.db", {
+        _init: function() {
+            this.host = null;
+            this.port = null;
+            this.collection = null;
+            this.database = null;
+        },
+
+        get_db_list: function(search, method){
+        
+            var url = '/fangofmongo/rest/mongo/' + this.host + '/' + this.port + '/';
+            var params = '';
+            if (search != '') { params += 'search=' + search; };
+            if (method != '') { params += '&method=' + method; };
+            if (params != '') { params  = '?' + params; };
+            
+            $.getJSON( url + 'databases/' + params,
+                function(data){
+                
+                    if ( 'error' in data ) { alert(data['error']); return; }
+                    //$('#fom_dialog_db_list').empty()
+                    //$.each(data['data'], function(){ var dn = document.createElement('div'); dn.fom_db = this; dn.innerHTML = escape_html(this);  $('#fom_dialog_db_list').append( dn ); });
+                    //$('#fom_dialog_db_list').children().click(function(){ connection_params.db = this.innerHTML;  fom_load_colls() });
+                });
+
+        }, //end of load_db_list:
+
+        get_collection_list: function(search, method){
+
+            var url = '/fangofmongo/rest/mongo/' + this.host + '/' + this.port + '/';
+            var params = '';
+            if (search == '') { params += 'search=' + search; };
+            if (method == '') { params += '&method=' + method; };
+            if (params != '') { params  = '?' + params; };
+            try{
+            $.getJSON( url + 'collections/'+ this.database  +'/' + params,
+                function(data){
+                    if ( 'error' in data ) { alert(data['error']); return; }
+                    //$('#fom_dialog_coll_list').empty()
+                    //$.each(data['data'], function(){ $('#fom_dialog_coll_list').append('<div>' +  this + '</div>') });
+                    //$.each(data['data'], function(){ var dn = document.createElement('div'); dn.fom_coll = this; dn.innerHTML = escape_html(this);  $('#fom_dialog_coll_list').append( dn ); });
+                   //$('#fom_dialog_db_list').children().click(function(){ fom_load_coll(this) });
+                        
+                }
+            ); //end of $.getJSON
+                
+            } catch(e) {alert(e);};
+
+
+        },
+
+
+    }); //end of widget ui.fom_object.db
+
+    }); //end of function
+
+
 
 } //end of fom_init_mongo_ui
 
 
 
-function escape_html(html_text)
-/*
-    Escape html characters
-*/
-{
-    return html_text.replace(/&/g,'&amp;').replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-}
 
 
-function fom_load_db(search, method)
-/*
-    Load database list from mongo.
-*/
-{
-var url = '/fangofmongo/rest/mongo/' + connection_params.host + '/' + connection_params.port + '/';
-var params = '';
-if (search == '') { params += 'search=' + search; };
-if (method == '') { params += '&method=' + method; };
-if (params != '') { params  = '?' + params; };
-try{
-$.getJSON('/fangofmongo/rest/mongo/' + connection_params.host + '/' + connection_params.port + '/databases/',
-    function(data){
-        if ( 'error' in data ) { alert(data['error']); return; }
-        $('#fom_dialog_db_list').empty()
-        $.each(data['data'], function(){ var dn = document.createElement('div'); dn.fom_db = this; dn.innerHTML = escape_html(this);  $('#fom_dialog_db_list').append( dn ); });
-        $('#fom_dialog_db_list').children().click(function(){ connection_params.db = this.innerHTML;  fom_load_colls() });
-            
-    }
-); //end of $.getJSON
-    
-} catch(e) {alert(e);};
-} // end of fom_load_db
 
-
-function fom_load_colls(search, method)
-/*
-    Load database list from mongo.
-*/
-{
-var url = '/fangofmongo/rest/mongo/' + connection_params.host + '/' + connection_params.port + '/';
-var params = '';
-if (search == '') { params += 'search=' + search; };
-if (method == '') { params += '&method=' + method; };
-if (params != '') { params  = '?' + params; };
-try{
-$.getJSON('/fangofmongo/rest/mongo/' + connection_params.host + '/' + connection_params.port + '/collections/'+ connection_params.db  +'/',
-    function(data){
-        if ( 'error' in data ) { alert(data['error']); return; }
-        $('#fom_dialog_coll_list').empty()
-        //$.each(data['data'], function(){ $('#fom_dialog_coll_list').append('<div>' +  this + '</div>') });
-        $.each(data['data'], function(){ var dn = document.createElement('div'); dn.fom_coll = this; dn.innerHTML = escape_html(this);  $('#fom_dialog_coll_list').append( dn ); });
-       //$('#fom_dialog_db_list').children().click(function(){ fom_load_coll(this) });
-            
-    }
-); //end of $.getJSON
-    
-} catch(e) {alert(e);};
-} // end of fom_load_db

@@ -3,6 +3,7 @@
 {% block js %}
 {{ block.super }}
 <script> var connection_params = { 'host':'{{ connection_params.host }}', 'port': '{{ connection_params.port }}', 'db' : null, 'coll': null }; </script>
+<script src="/static/fom/js/fangofmongo_utils.js"></script>
 <script src="/static/fom/js/fangofmongo_ui.js"></script>
 <script> try { fom_init_mongo_ui(); } catch(e) { alert(e); };  </script>
 {% endblock %}
