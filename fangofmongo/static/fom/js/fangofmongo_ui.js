@@ -6,6 +6,7 @@ function fom_init_mongo_ui()
     Base class for fom gui objects
 */
 {
+
     $(function() {
 
 
@@ -13,27 +14,15 @@ $.widget("ui.fom_object", {
    _init: function() {
      // init code for mywidget
      // can use this.options
-     this.listeners = new Array();
      this.active = false;
-     alert('root init');
+     //alert('root init');
    },
-//   value: function(a) { return a; },
+   //value: function(a) { return a; },
    length: function ( ) { return this.listeners.length;  },
    active:  function ( ) { return this.active;  },
-   add_listener: function(listener) {
-      this.listeners[this.listeners.length] = listener;
-   },
 
-   del_listener: function(listener) {
-      // internal functions should be named begin with an underscore
-      // manipulate the widget
-      for(var i = this.listeners.length; i>=0; i++)
-      {
-        if (this.listeners[i] == listener) this.listeners.splice(i, 1);
-      }
-   },
    signal: function(signal_name, signal_source, signal_data ) {
-    //this.signal[this.signals.length] = signal_name;
+
    },
 
    destroy: function() {
@@ -50,107 +39,127 @@ $.widget("ui.fom_object", {
      hidden: true
    }
  });
+//end of fom_object
 
 
 
-$.widget("ui.fom_object_db", {
-   _init: function() {
-     // init code for mywidget
-     // can use this.options
-     this.listeners = new Array();
-     this.active = false;
-     $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
-   },
-//   value: function(a) { return a; },
-   length: function ( ) { return this.listeners.length;  },
-   active:  function ( ) { return this.active;  },
-
-   signal: function(signal_name, signal_source, signal_data ) {
-        alert('db received signal' + signal_name);
-   },
-
-   destroy: function() {
-       $.widget.prototype.apply(this, arguments); // default destroy
-   }
- });
+/*
+Fom_object2 = $.extend({}, $.ui.fom_object.prototype,{
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        alert('inherited init');
+    }, 
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_object2", Fom_object2); 
+*/
 
 
- $.extend($.ui.fom_object_db, {
-   getters: "value length",
-   defaults: {
-     active: false,
-     hidden: true
-   }
- });
+/**
+*
+*       Data bus
+*
+*/
 
+Fom_bus = $.extend({}, $.ui.fom_object.prototype,{
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        this.listeners = new Array();
+        this.active = true;
 
-$.widget("ui.fom_object_colls", {
-   _init: function() {
-     // init code for mywidget
-     // can use this.options
-     this.listeners = new Array();
-     this.active = false;
-     $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
-   },
-//   value: function(a) { return a; },
-   length: function ( ) { return this.listeners.length;  },
-   active:  function ( ) { return this.active;  },
+}, 
+    length: function ( ) { return this.listeners.length;  },
+    active:  function ( ) { return this.active;  },
 
-   signal: function(signal_name, signal_source, signal_data ) {
-        alert('colls received signal' + signal_name);
-   },
+    add_listener: function(listener) {
+        this.listeners[this.listeners.length] = listener;
+    },
 
-   destroy: function() {
-       $.widget.prototype.apply(this, arguments); // default destroy
-   }
- });
-
-
- $.extend($.ui.fom_object_colls, {
-   getters: "value length",
-   defaults: {
-     active: false,
-     hidden: true
-   }
- });
-
-
-
-$.widget("ui.fom_bus", {
-   _init: function() {
-     // init code for mywidget
-     // can use this.options
-     this.listeners = new Array();
-     this.active = true;
-   },
-//   value: function(a) { return a; },
-   length: function ( ) { return this.listeners.length;  },
-   active:  function ( ) { return this.active;  },
-   add_listener: function(listener) {
-      this.listeners[this.listeners.length] = listener;
-   },
-
-   signal: function(signal_name, signal_source, signal_data ) {
+    signal: function(signal_name, signal_source, signal_data ) {
+        $.ui.fom_object.prototype.signal.call(this);
         alert('bus received signal' + signal_name);
         for ( var obj in this.listeners)
         {
-          this.listeners[obj].signal(signal_name, signal_source, signal_data);
+            this.listeners[obj].signal(signal_name, signal_source, signal_data);
         };
-   },
+    },
 
-   destroy: function() {
-       $.widget.prototype.apply(this, arguments); // default destroy
-   }
- });
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_bus", Fom_bus); 
 
 
- $.extend($.ui.fom_bus, {
-   getters: "value length",
-   defaults: {
-     active: false,
-     hidden: true
-   }
- });
+/**
+*
+*       Item list ui object
+*
+*/
+
+Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+    }, 
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_ui_list", Fom_item_list); 
+
+
+//end of item list ui object
+
+/**
+*
+*       Database list
+*
+*/
+
+Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
+    }, 
+   signal: function(signal_name, signal_source, signal_data ) {
+        alert('db received signal' + signal_name);
+   },    
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_object_db", Fom_db_list); 
+//end of database list
+
+/**
+*
+*       Collection list
+*
+*/
+
+Fom_coll_list = $.extend({}, $.ui.fom_object.prototype, {
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
+    }, 
+   signal: function(signal_name, signal_source, signal_data ) {
+        alert('colls received signal' + signal_name);
+   },    
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_object_colls", Fom_coll_list); 
+//end of collection list
+
+
+/**
+*
+*       Init UI objects
+*
+*/
 
 
 
@@ -163,7 +172,7 @@ $('#mongo_ui_header_tools_coll').fom_object_colls();
 
 $('#mongo_ui_header_tools_bus').fom_bus('signal', 'app_init', this, {} );
 
-alert(2);
+
 
  
 /*
