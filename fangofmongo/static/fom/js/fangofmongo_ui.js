@@ -103,7 +103,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         this.item_list_id = this.options['div_id'] + '_list';
         this.input_id = '#' + this.options['div_id'] + '_input';
 
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "' title='" + this.options['title'] + "'><input type='text' name='" + this.input_id +"' id='fom_input_db'/><div id='" + this.item_list_id + "'></div></div>");
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><div id='" + this.item_list_id + "'></div></div>");
      
      
      //dialog - item list
@@ -113,6 +113,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
             width: 200,
             modal: false,
             closeOnEscape: false,
+            title: this.options['title'],
             buttons: {},
             position : ['left',100],
 
@@ -139,6 +140,95 @@ $.widget("ui.fom_ui_list", Fom_item_list);
 
 
 //end of item list ui object
+
+
+/**
+*
+*       Console ui object
+*
+*/
+
+Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        this.dialog_id = this.options['div_id'] + '_dialog';
+        this.console_id = this.options['div_id'] + '_console_div';
+        this.input_id = this.options['div_id'] + '_input';
+        this.button_id = this.options['div_id'] + '_button';
+
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.button_id + "'>Run</button><div id='" + this.console_id + "'></div></div>");
+        var my_id = '#' + this.options['div_id'];
+        var input_id = this.input_id;
+        $('#' + this.button_id).click(function() { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) } );
+     
+     
+     //dialog - item list
+     $('#' + this.options['div_id'] + '_dialog').dialog({
+            autoOpen: true,
+            height: 500,
+            width: 400,
+            modal: false,
+            closeOnEscape: false,
+            buttons: {},
+            title: this.options['title'],
+            position : [220,100],
+
+     }); //end of dialog
+
+     $('#' + this.dialog_id).dialog('open');
+     var dialog_id = this.dialog_id
+     $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
+
+    }, 
+    
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_ui_console", Fom_ui_console); 
+
+
+//end of console ui object
+
+
+/**
+*
+*       Console object
+*
+*/
+
+Fom_console = $.extend({}, $.ui.fom_object.prototype, {
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
+        $('#mongo_ui_container').append("<div id='mongo_ui_console'></div>");
+        $('#mongo_ui_console').fom_ui_console({'title':'Mongo console', 'div_id': 'mongo_ui_console', 'tool_button_id' : 'mongo_ui_header_tools_console' });
+        $('#mongo_ui_console').bind('console_exec', function(e, cmd){  alert(cmd) });
+    }, 
+   signal: function(signal_name, signal_source, signal_data ) {
+        //alert('db received signal' + signal_name);
+        if (signal_name == 'app_init')
+        {
+            //$('#mongo_ajax').fom_object_mongo_ajax('get_db_list','','')
+        }
+        if ( signal_name == 'database_selected')
+        {
+            $('#mongo_ui_console_dialog').dialog('option','title','Mongo console [' + signal_data['database'] + ']');
+            //$('#mongo_ui_database_list').fom_ui_list('set_list', signal_data['data'], signal_data['search'], signal_data['method']);
+        }
+        if ( signal_name == 'collection_selected')
+        {
+            var db_name = $('#mongo_ajax').fom_object_mongo_ajax('option','database');
+            $('#mongo_ui_console_dialog').dialog('option','title','Mongo console [' + db_name + ' -> ' + signal_data['collection'] + ']');
+        }        
+   },    
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_console", Fom_console); 
+//end of console
+
 
 /**
 *
@@ -275,7 +365,12 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
         {
             this.options['database'] = signal_data['database'];
 
-        }        
+        }
+        if (signal_name == 'collection_selected')
+        {
+            this.options['collection'] = signal_data['collection'];
+
+        }                
    },    
 
     }); //end of widget ui.fom_object.db
@@ -290,22 +385,27 @@ $.widget("ui.fom_object_mongo_ajax", Fom_mongo_ajax);
 *
 */
 
-
+//init bus
 $('#mongo_ui_header_tools_bus').fom_bus();
 
-$('#mongo_ui_container').fom_object();
 
 $('#mongo_ui_container').append("<div id='mongo_ajax'></div>");
-
 $('#mongo_ajax').fom_object_mongo_ajax({'host':'localhost', 'port': 27017, 'database' : null, 'collection' : null });
 
+//init console
+$('#mongo_ui_container').append("<div id='mongo_console'></div>");
+$('#mongo_console').fom_console();
 
-
+//init db list
 $('#mongo_ui_header_tools_db').fom_object_db();
+
+//init collection list
 $('#mongo_ui_header_tools_coll').fom_object_colls();
 
+//tell everybody we are starting the party
 $('#mongo_ui_header_tools_bus').fom_bus('signal', 'app_init', this, {} );
 
+//hide error msg
 $('#errormsg').hide();
 
 
@@ -314,49 +414,5 @@ $('#errormsg').hide();
 }); //end of function
 
 } //end of fom_init_mongo_ui
-
-
-/*
-
-     //fom_dialog_coll - collection list
-     $("#fom_dialog_coll").dialog({
-            autoOpen: true,
-            height: 200,
-            width: 200,
-            modal: false,
-            closeOnEscape: false,
-            buttons: {},
-            position : ['left',350],
-
-     }); //end of $("#fom_dialog_coll").dialog
-
-     $('#fom_dialog_coll').dialog('open');
-     $('#mongo_ui_header_tools_coll').click(function () { $('#fom_dialog_coll').dialog('isOpen')? $('#fom_dialog_coll').dialog('close') : $('#fom_dialog_coll').dialog('open');});
-
-     //fom_console_dialog 
-     $("#fom_console_dialog").dialog({
-            autoOpen: true,
-            height: 450,
-            width: 500,
-            modal: false,
-            closeOnEscape: false,
-            buttons: {},
-            position : [250,100],
-
-     }); //end of $("#fom_dialog_coll").dialog
-     $('#mongo_ui_header_tools_console').click(function () { $('#fom_console_dialog').dialog('isOpen')? $('#fom_console_dialog').dialog('close') : $('#fom_console_dialog').dialog('open');});
-
-     $('#fom_dialog_coll').dialog('open');
-
-
-     //get database list
-     fom_load_db();
-
-*/
-
-
-
-
-
 
 
