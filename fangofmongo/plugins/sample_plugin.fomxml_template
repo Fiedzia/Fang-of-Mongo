@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<plugins>
+  <plugin>
+    <!-- Plugin info -->
+    <info>
+      <name>Sample plugin</name>
+      <author>me</author>
+      <description>Sample plugin that does nothing</description>
+      <version>1.0</version>
+    </info>
+    <!-- Plugin code and resources -->
+    <resources>
+      <css>
+      </css>
+      <js>
+      <![CDATA[
+          <script type="text/javascript">alert('Sample plugin'); </script>
+      ]]>
+      </js>
+      <html>
+      <![CDATA[
+          <div id="sample_plugin">Sample plugin</div>
+      ]]>
+      </html>
+    </resources>
+  </plugin>
+</plugins>
+
