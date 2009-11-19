@@ -5,6 +5,8 @@ from django.utils import simplejson as json
 import re
 import pymongo
 
+import handle_plugins
+
 #login view
 def start_page(request):
     """
@@ -17,8 +19,14 @@ def ui_page(request, host, port):
     """
         mongo user interface
     """
+    plugins = handle_plugins.load_plugins()
+    for plugin in plugins:
+        print 'plugin', plugin.name, plugin.js
     return render_to_response('fom/templates/mongo_ui_page.html',
-            { 'connection_params' : {'host':host, 'port': port,'db': None,'coll':None}}
+            {
+              'connection_params' : { 'host' : host, 'port' : port, 'db' : None, 'coll' : None },
+              'plugins' : plugins 
+            }
             )
 
 #########  mongo interface. Ok, just stub of it.

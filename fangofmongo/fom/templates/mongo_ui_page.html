@@ -5,12 +5,32 @@
 <script> var connection_params = { 'host':'{{ connection_params.host }}', 'port': '{{ connection_params.port }}', 'db' : null, 'coll': null }; </script>
 <script src="/static/fom/js/fangofmongo_utils.js"></script>
 <script src="/static/fom/js/fangofmongo_ui.js"></script>
+
+{% if plugins %}
+  <script type="text/javascript">
+  function fom_init_plugins(){
+  {% for plugin in plugins %}
+    {% if plugin.js %}
+    <!--js for plugin {{ plugin.name }} -->
+    {{ plugin.js|safe }}
+    {% endif %}
+  {% endfor %}
+  };
+  </script>
+{% endif %}
 <script> try { fom_init_mongo_ui(); } catch(e) { alert(e); };  </script>
 {% endblock %}
+
+
 
 {% block css %}
 {{ block.super }}
 <link rel=stylesheet href="/static/fom/css/fangofmongo_ui.css" type="text/css"/>
+{% if plugins %}
+  {% for plugin in plugins %}
+    {% if plugin.css %} <!--css for plugin {{ plugin.name }} --> {{ plugin.css|safe }}{% endif %}
+  {% endfor %}
+{% endif %}
 {% endblock %}
 
 {% block header %}
@@ -20,7 +40,7 @@ Fang of mongo
 </div>
 <div id="mongo_ui_header_tools">
     <div id="mongo_ui_header_tools_bus">
-        Database list
+        Server list
     </div>
     <div id="mongo_ui_header_tools_db">
         Database list
@@ -40,8 +60,13 @@ Fang of mongo
 {% block content %}
 {{ block.super }}
 <!-- mongo_ui_container -->
-<div id="mongo_ui_container"></div>
-{% include 'fom/templates/mongo_console.html' %}
+<div id="mongo_ui_container">
+{% if plugins %}
+  {% for plugin in plugins %}
+    {% if plugin.html %} <!--html for plugin {{ plugin.name }} --> {{ plugin.html|safe }}{% endif %}
+  {% endfor %}
+{% endif %}
+</div>
 
 
 {% endblock content %}

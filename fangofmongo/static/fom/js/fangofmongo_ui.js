@@ -14,10 +14,10 @@ $.widget("ui.fom_object", {
      // init code for mywidget
      // can use this.options
      this.active = false;
-     //alert('root init');
+
    },
    //value: function(a) { return a; },
-   length: function ( ) { return this.listeners.length;  },
+   //length: function ( ) { return this.listeners.length;  },
    active:  function ( ) { return this.active;  },
 
    signal: function(signal_name, signal_source, signal_data ) {
@@ -75,8 +75,8 @@ Fom_bus = $.extend({}, $.ui.fom_object.prototype,{
     },
 
     signal: function(signal_name, signal_source, signal_data ) {
+        //alert('sending' + signal_name);
         $.ui.fom_object.prototype.signal.call(this);
-        //alert('bus received signal' + signal_name);
         for ( var obj in this.listeners)
         {
             this.listeners[obj].signal(signal_name, signal_source, signal_data);
@@ -88,58 +88,7 @@ Fom_bus = $.extend({}, $.ui.fom_object.prototype,{
     }, 
 }); 
 $.widget("ui.fom_bus", Fom_bus); 
-
-
-/**
-*
-*       Item list ui object
-*
-*/
-
-Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
-    _init: function(){ 
-        $.ui.fom_object.prototype._init.call(this); // call the original function 
-        this.dialog_id = this.options['div_id'] + '_dialog';
-        this.item_list_id = this.options['div_id'] + '_list';
-        this.input_id = '#' + this.options['div_id'] + '_input';
-
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><div id='" + this.item_list_id + "'></div></div>");
-     
-     
-     //dialog - item list
-     $('#' + this.options['div_id'] + '_dialog').dialog({
-            autoOpen: true,
-            height: 200,
-            width: 200,
-            modal: false,
-            closeOnEscape: false,
-            title: this.options['title'],
-            buttons: {},
-            position : ['left',100],
-
-     }); //end of dialog
-
-     $('#' + this.dialog_id).dialog('open');
-     var dialog_id = this.dialog_id
-     $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
-
-    }, 
-    set_list: function(item_list, search, method){
-        var id_name = '#' + this.item_list_id;
-        $('#' + this.item_list_id).empty();
-        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; dn.innerHTML = escape_html(this);  $(id_name).append( dn ); });
-        var my_id = '#' + this.options['div_id'];
-        $('#' + this.item_list_id).children().click(function(){ $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
-    },
-    
-    destroy: function(){ 
-        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
-    }, 
-}); 
-$.widget("ui.fom_ui_list", Fom_item_list); 
-
-
-//end of item list ui object
+//end of data bus
 
 
 /**
@@ -172,11 +121,20 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
             buttons: {},
             title: this.options['title'],
             position : [220,100],
+            //fix for jqueryui - remember dialog position between open/close. Already fixed in jqueryui trunk
+            beforeclose: function(){
+                $(this).dialog('option', 'position', [$(this).offset().left, $(this).offset().top]);
+                $(this).dialog('option', 'width', $(this).width());
+                $(this).dialog('option', 'height', $(this).height());
+            },
+
+
+            
 
      }); //end of dialog
 
      $('#' + this.dialog_id).dialog('open');
-     var dialog_id = this.dialog_id
+     var dialog_id = this.dialog_id;
      $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
 
     }, 
@@ -209,7 +167,7 @@ Fom_console = $.extend({}, $.ui.fom_object.prototype, {
         //alert('db received signal' + signal_name);
         if (signal_name == 'app_init')
         {
-            //$('#mongo_ajax').fom_object_mongo_ajax('get_db_list','','')
+
         }
         if ( signal_name == 'database_selected')
         {
@@ -229,19 +187,76 @@ Fom_console = $.extend({}, $.ui.fom_object.prototype, {
 $.widget("ui.fom_console", Fom_console); 
 //end of console
 
+/**
+*
+*       Item list ui object
+*
+*/
+
+Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        this.dialog_id = this.options['div_id'] + '_dialog';
+        this.item_list_id = this.options['div_id'] + '_list';
+        this.input_id = '#' + this.options['div_id'] + '_input';
+
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><div id='" + this.item_list_id + "'></div></div>");
+     
+     
+     //dialog - item list
+     $('#' + this.options['div_id'] + '_dialog').dialog({
+            autoOpen: true,
+            height: 200,
+            width: 200,
+            modal: false,
+            closeOnEscape: false,
+            title: this.options['title'],
+            buttons: {},
+            position : this.options['position'],
+            //fix for jqueryui - remember dialog position between open/close. Already fixed in jqueryui trunk
+            beforeclose: function(){
+                $(this).dialog('option', 'position', [$(this).offset().left, $(this).offset().top]);
+                $(this).dialog('option', 'width', $(this).width());
+                $(this).dialog('option', 'height', $(this).height());
+            },
+
+     }); //end of dialog
+
+     $('#' + this.dialog_id).dialog('open');
+     var dialog_id = this.dialog_id
+     $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
+
+    }, 
+    set_list: function(item_list, search, method){
+        var id_name = '#' + this.item_list_id;
+        $('#' + this.item_list_id).empty();
+        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; dn.innerHTML = escape_html(this);  $(id_name).append( dn ); });
+        var my_id = '#' + this.options['div_id'];
+        $('#' + this.item_list_id).children().click(function(){ $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
+    },
+    
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_ui_list", Fom_item_list); 
+
+
+//end of item list ui object
+
 
 /**
 *
 *       Database list
 *
 */
-
+/*
 Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function 
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         $('#mongo_ui_container').append("<div id='mongo_ui_database_list'></div>");
-        $('#mongo_ui_database_list').fom_ui_list({'title':'Databases', 'div_id': 'mongo_ui_database_list', 'tool_button_id' : 'mongo_ui_header_tools_db' });
+        $('#mongo_ui_database_list').fom_ui_list({'title':'Databases', 'div_id': 'mongo_ui_database_list', 'tool_button_id' : 'mongo_ui_header_tools_db' ,'position':['left', 200]});
         $('#mongo_ui_database_list').bind('fom_item_selected', function(e, dbname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_selected', this, {'database': dbname } ); });
     }, 
    signal: function(signal_name, signal_source, signal_data ) {
@@ -260,6 +275,9 @@ Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
     }, 
 }); 
 $.widget("ui.fom_object_db", Fom_db_list); 
+
+*/
+
 //end of database list
 
 /**
@@ -273,7 +291,7 @@ Fom_coll_list = $.extend({}, $.ui.fom_object.prototype, {
         $.ui.fom_object.prototype._init.call(this); // call the original function 
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         $('#mongo_ui_container').append("<div id='mongo_ui_collection_list'></div>");
-        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll' });
+        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 450] });
         $('#mongo_ui_collection_list').bind('fom_item_selected', function(e, dbname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': dbname } ); });
     }, 
         
@@ -378,7 +396,6 @@ $.widget("ui.fom_object_mongo_ajax", Fom_mongo_ajax);
 
 
 
-
 /**
 *
 *       Init UI objects
@@ -397,13 +414,18 @@ $('#mongo_ui_container').append("<div id='mongo_console'></div>");
 $('#mongo_console').fom_console();
 
 //init db list
-$('#mongo_ui_header_tools_db').fom_object_db();
+//$('#mongo_ui_header_tools_db').fom_object_db();
 
 //init collection list
 $('#mongo_ui_header_tools_coll').fom_object_colls();
 
+
+//initialize all plugins
+fom_init_plugins();
+
 //tell everybody we are starting the party
 $('#mongo_ui_header_tools_bus').fom_bus('signal', 'app_init', this, {} );
+
 
 //hide error msg
 $('#errormsg').hide();

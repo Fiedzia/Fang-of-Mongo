@@ -79,3 +79,5 @@ INSTALLED_APPS = (
     #'django.contrib.sites',
     'fangofmongo.fom',
 )
+
+FOM_PLUGIN_DIR = '/home/fiedzia/moje/fangofmongo/fangofmongo/plugins/'
