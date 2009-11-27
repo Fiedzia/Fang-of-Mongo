@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <plugins>
+<!-- Database list  -->
   <plugin>
     <!-- Plugin info -->
     <info>
@@ -14,26 +15,32 @@
       </css>
       <js>
       <![CDATA[
+      
 
 Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function 
+        var this_obj = this;
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this );
         $('#mongo_ui_container').append("<div id='mongo_ui_database_list'></div>");
         $('#mongo_ui_database_list').fom_ui_list({'title':'Databases', 'div_id': 'mongo_ui_database_list', 'tool_button_id' : 'mongo_ui_header_tools_db' ,'position':['left', 200]});
+        $('#mongo_ui_database_list').bind('search', function(e, query){ this_obj.search(query); });
         $('#mongo_ui_database_list').bind('fom_item_selected', function(e, dbname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_selected', this, {'database': dbname } ); });
 
     }, 
    signal: function(signal_name, signal_source, signal_data ) {
         if (signal_name == 'app_init')
         {
-            $('#mongo_ajax').fom_object_mongo_ajax('get_db_list','','')
+            $('#mongo_ajax').fom_object_mongo_ajax('get_db_list','','');
         }
         if ( signal_name == 'database_list_received')
         {
             $('#mongo_ui_database_list').fom_ui_list('set_list', signal_data['data'], signal_data['search'], signal_data['method']);
         }
-   },    
+   },
+   search: function(query){
+       $('#mongo_ajax').fom_object_mongo_ajax('get_db_list',query,'');
+   },
     destroy: function(){ 
         $.ui.fom_object.prototype.destroy.call(this); // call the original function 
     }, 
@@ -43,13 +50,15 @@ $.widget("ui.fom_object_db", Fom_db_list);
 
 //init db list
 $('#mongo_ui_header_tools_db').fom_object_db();
+//end of database list
 
-          
+
       ]]>
       </js>
       <html>
       </html>
     </resources>
   </plugin>
+
 </plugins>
 
