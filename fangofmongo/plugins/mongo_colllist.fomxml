@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<plugins>
+<!-- Collection list  -->
+  <plugin>
+    <!-- Plugin info -->
+    <info>
+      <name>Mongo collection list</name>
+      <author>Maciej Dziardziel (maciejdziardziel@wp.pl)</author>
+      <description>Show list of collections</description>
+      <version>1.0</version>
+    </info>
+    <!-- Plugin code and resources -->
+    <resources>
+      <css>
+      </css>
+      <js>
+      <![CDATA[
+      
+Fom_coll_list = $.extend({}, $.ui.fom_object.prototype, {
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        var this_obj = this;    
+        $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
+        $('#mongo_ui_container').append("<div id='mongo_ui_collection_list'></div>");
+        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 450] });
+        $('#mongo_ui_collection_list').bind('search', function(e, query){ this_obj.search(query); });
+        $('#mongo_ui_collection_list').bind('fom_item_selected', function(e, collname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': collname } ); });
+    }, 
+        
+   signal: function(signal_name, signal_source, signal_data ) {
+        //alert('colls received signal' + signal_name);
+        if (signal_name == 'database_selected')
+        {
+            $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list','','')
+        }        
+        if ( signal_name == 'collection_list_received')
+        {
+            $('#mongo_ui_collection_list').fom_ui_list('set_list', signal_data['data'], signal_data['search'], signal_data['method']);
+        }
+
+    },    
+   search: function(query){
+       $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
+   },
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_object_colls", Fom_coll_list); 
+
+//init collection list
+$('#mongo_ui_header_tools_coll').fom_object_colls();
+
+//end of collection list
+
+
+      ]]>
+      </js>
+      <html>
+      </html>
+    </resources>
+  </plugin>
+
+</plugins>
+
