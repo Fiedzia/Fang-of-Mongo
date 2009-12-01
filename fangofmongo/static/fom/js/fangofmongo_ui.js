@@ -200,7 +200,8 @@ $.widget("ui.fom_console", Fom_console);
 
 Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
-        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        $.ui.fom_object.prototype._init.call(this); // call the original function
+        this.options['title_prefix'] = this.options['title'];
         this.dialog_id = this.options['div_id'] + '_dialog';
         this.item_list_id = this.options['div_id'] + '_list';
         this.input_id = this.options['div_id'] + '_input';
@@ -212,6 +213,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         var search_id = this.search_id;
         var clear_id = this.clear_id;
         var input_id = this.input_id;
+
      
      //dialog - item list
      $('#' + this.options['div_id'] + '_dialog').dialog({
@@ -235,10 +237,12 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
      $('#' + this.dialog_id).dialog('open');
      var dialog_id = this.dialog_id
      $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
-     
-     $('#' + search_id).click(function() { $('#' + dialog_id).dialog('option','title','Databases ~' + $('#' + input_id).get(0).value); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) } );     
-     $('#' + clear_id).click(function() { $('#' + dialog_id).dialog('option','title','Databases'); $('#' + input_id).get(0).value = ''; $(my_id).trigger('search', ['']) } );     
-     $('#' + input_id).keyup(function(event) { if (event.keyCode == 13) { $('#' + dialog_id).dialog('option','title','Databases ~' + $('#' + input_id).get(0).value ); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) }} );                
+     //set title properly when appending filter there
+     $('#' + dialog_id).dialog('option','title_prefix',this.options['title']);
+
+     $('#' + search_id).click(function() { $('#' + dialog_id).dialog('option','title', $('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) } );     
+     $('#' + clear_id).click(function() { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')); $('#' + input_id).get(0).value = ''; $(my_id).trigger('search', ['']) } );     
+     $('#' + input_id).keyup(function(event) { if (event.keyCode == 13) { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value ); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) }} );                
      
 
     }, 
