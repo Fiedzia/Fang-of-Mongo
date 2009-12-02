@@ -6,6 +6,7 @@ import re
 import pymongo
 
 import handle_plugins
+from exceptions import CmdException
 
 #login view
 def start_page(request):
@@ -15,13 +16,14 @@ def start_page(request):
     return render_to_response('fom/templates/start_page.html', {})
 
 #login view
+#@auth_required
 def ui_page(request, host, port):
     """
         mongo user interface
     """
     plugins = handle_plugins.load_plugins()
-    for plugin in plugins:
-        print 'plugin', plugin.name, plugin.js
+    #for plugin in plugins:
+    #    print 'plugin', plugin.name, plugin.js
     return render_to_response('fom/templates/mongo_ui_page.html',
             {
               'connection_params' : { 'host' : host, 'port' : port, 'db' : None, 'coll' : None },
@@ -30,7 +32,7 @@ def ui_page(request, host, port):
             )
 
 #########  mongo interface. Ok, just stub of it.
-
+#@auth_required
 def list_databases(request, host, port):
     """
     From GET take:  login, password : database credentials(optional, currently ignored)
@@ -56,7 +58,7 @@ def list_databases(request, host, port):
         
     return HttpResponse(json_response, mimetype='application/json')
 
-
+#@auth_required
 def list_collections(request, host, port, dbname):
     """
     From GET take:  login, password : database credentials(optional, currently ignored)
@@ -82,4 +84,24 @@ def list_collections(request, host, port, dbname):
         
     return HttpResponse(json_response, mimetype='application/json')
 
+#@auth_required
+def exec_cmd(request):
+    """
+        get params from POST and execute command
+    """
+    error_msg = None
+    cmd = None
+    print 'DATA:', request.POST
+    try:
+        if not 'cmd' in request.POST:
+            raise CmdException('No command given')
+        cmd = request.POST['cmd']
+        if cmd == 'help':
+            json_response = json.dumps({'data': 'some help', 'type' : 'html'})
+        
+    except (CmdException,), e:
+        json_response = json.dumps({'error': e.message})
+    except (Exception), e:
+        json_response = json.dumps({'error': repr(e)})
+    return HttpResponse(json_response, mimetype='application/json')
 

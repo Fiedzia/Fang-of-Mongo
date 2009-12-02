@@ -105,11 +105,11 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
         this.input_id = this.options['div_id'] + '_input';
         this.button_id = this.options['div_id'] + '_button';
 
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.button_id + "'>Run</button><div id='" + this.console_id + "'></div></div>");
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.button_id + "'>Run</button><div id='" + this.console_id + "'></div><div></div></div>");
         var my_id = '#' + this.options['div_id'];
         var input_id = this.input_id;
         $('#' + this.button_id).click(function() { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) } );
-        $('#' + this.input_id).keyup(function(event) { if (event.keyCode == 13) { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) }} );                
+        $('#' + this.input_id).keypress(function(event) { if (event.keyCode == 13) { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) }} );                
 
 
      //dialog - item list
@@ -138,7 +138,16 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
      var dialog_id = this.dialog_id;
      $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
 
-    }, 
+    },
+    
+     response_error : function (err) {
+     }, //end of reponse_error
+     response : function (data) {
+         //alert(data);
+         if (data.type == 'html') {
+             $('#' + this.console_id).prepend('<div class="fom_console_message">' + data.data + '</div>')
+         };
+     }, //end of reponse_error    
     
     destroy: function(){ 
         $.ui.fom_object.prototype.destroy.call(this); // call the original function 
@@ -166,24 +175,42 @@ Fom_console = $.extend({}, $.ui.fom_object.prototype, {
         $('#mongo_ui_console').bind('console_exec', function(e, cmd){  this_obj.exec_cmd(cmd); });
     }, 
    signal: function(signal_name, signal_source, signal_data ) {
-        //alert('db received signal' + signal_name);
         if (signal_name == 'app_init')
         {
 
         }
-        if ( signal_name == 'database_selected')
+        else if ( signal_name == 'database_selected')
         {
             $('#mongo_ui_console_dialog').dialog('option','title','Mongo console [' + signal_data['database'] + ']');
             //$('#mongo_ui_database_list').fom_ui_list('set_list', signal_data['data'], signal_data['search'], signal_data['method']);
         }
-        if ( signal_name == 'collection_selected')
+        else if ( signal_name == 'collection_selected')
         {
             var db_name = $('#mongo_ajax').fom_object_mongo_ajax('option','database');
             $('#mongo_ui_console_dialog').dialog('option','title','Mongo console [' + db_name + ' -> ' + signal_data['collection'] + ']');
         }        
    },
    exec_cmd: function(cmd){
+       cmd = cmd.trim();
+       if (cmd.length == 0) {
+           return;
+       }
+       var my_console_instance = this;
+       if (cmd[0] == ':') {    //server command
+           $('#mongo_ajax').fom_object_mongo_ajax('exec_cmd', my_console_instance, cmd);
+       } else {
+           alert('Unknown command: ' + cmd);
+       }
    //alert('cmd:'+ cmd);
+   },
+   //process cmd response
+   process_response: function(data){
+       if (data.error) {
+           $('#mongo_ui_console').fom_ui_console('response_error',data.error);
+       } else {
+           $('#mongo_ui_console').fom_ui_console('response', data);
+       }
+       
    },
     destroy: function(){ 
         $.ui.fom_object.prototype.destroy.call(this); // call the original function 
@@ -280,9 +307,21 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             //this.collection = null;
             //this.database = null; },
        },     
+        // process server response to exec_cmd
+        process_response: function(caller_id, data) {
+            caller_id.process_response(data);
+            //alert(caller_id);
+        }, // end of process_reponse
+        
+        exec_cmd: function(console_obj, cmd){
+            var url = '/fangofmongo/rest/mongo/cmd/';
+            var caller_id = console_obj;
+            var my_console = this;
+
+            $.post(url, {'cmd':'help'}, function(data){ my_console.process_response(caller_id, data); }, "json");
             
-
-
+        }, //end of exec_cmd:
+        
         get_db_list: function(search, method){
             var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
             var params = '';
