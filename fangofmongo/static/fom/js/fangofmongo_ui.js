@@ -123,11 +123,11 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
             title: this.options['title'],
             position : [220,100],
             //fix for jqueryui - remember dialog position between open/close. Already fixed in jqueryui trunk
-            beforeclose: function(){
+            /*beforeclose: function(){
                 $(this).dialog('option', 'position', [$(this).offset().left, $(this).offset().top]);
                 $(this).dialog('option', 'width', $(this).width());
                 $(this).dialog('option', 'height', $(this).height());
-            },
+            },*/
 
 
             
@@ -253,11 +253,11 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
             buttons: {},
             position : this.options['position'],
             //fix for jqueryui - remember dialog position between open/close. Already fixed in jqueryui trunk
-            beforeclose: function(){
+            /*beforeclose: function(){
                 $(this).dialog('option', 'position', [$(this).offset().left, $(this).offset().top]);
                 $(this).dialog('option', 'width', $(this).width());
                 $(this).dialog('option', 'height', $(this).height());
-            },
+            },*/
 
      }); //end of dialog
 
@@ -276,9 +276,9 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
     set_list: function(item_list, search, method){
         var id_name = '#' + this.item_list_id;
         $('#' + this.item_list_id).empty();
-        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; dn.innerHTML = escape_html(this);  $(id_name).append( dn ); });
+        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; $(dn).addClass('fom_ui_list_item');  dn.innerHTML = escape_html(this);  $(id_name).append( dn ); });
         var my_id = '#' + this.options['div_id'];
-        $('#' + this.item_list_id).children().click(function(){ $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
+        $('#' + this.item_list_id).children().click(function(){ $(id_name).children().each(function() {$(this).removeClass('fom_ui_list_item_selected');});  $(this).addClass('fom_ui_list_item_selected'); $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
     },
     
     destroy: function(){ 
