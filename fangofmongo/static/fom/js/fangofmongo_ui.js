@@ -109,7 +109,7 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
         var my_id = '#' + this.options['div_id'];
         var input_id = this.input_id;
         $('#' + this.button_id).click(function() { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) } );
-        $('#' + this.input_id).keypress(function(event) { if (event.keyCode == 13) { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) }} );                
+        $('#' + this.input_id).keypress(function(event) { if (event.keyCode == 13) { $(my_id).trigger('console_exec', [$('#' + input_id).get(0).value]) }} );
 
 
      //dialog - item list
@@ -122,15 +122,6 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
             buttons: {},
             title: this.options['title'],
             position : [220,100],
-            //fix for jqueryui - remember dialog position between open/close. Already fixed in jqueryui trunk
-            /*beforeclose: function(){
-                $(this).dialog('option', 'position', [$(this).offset().left, $(this).offset().top]);
-                $(this).dialog('option', 'width', $(this).width());
-                $(this).dialog('option', 'height', $(this).height());
-            },*/
-
-
-            
 
      }); //end of dialog
 
@@ -235,7 +226,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         this.search_id = this.options['div_id'] + '_search';
         this.clear_id = this.options['div_id'] + '_clear';
         
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div id='" + this.item_list_id + "'></div></div>");
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div class='fom_ui_list_items'><div id='" + this.item_list_id + "'></div></div></div>");
         var my_id = '#' + this.options['div_id'];
         var search_id = this.search_id;
         var clear_id = this.clear_id;
@@ -245,7 +236,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
      //dialog - item list
      $('#' + this.options['div_id'] + '_dialog').dialog({
             autoOpen: true,
-            height: 200,
+            height: 300,
             width: 200,
             modal: false,
             closeOnEscape: false,
@@ -337,7 +328,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
 
                 });
 
-        }, //end of load_db_list:
+        }, //end of get_db_list:
 
 
 
@@ -359,7 +350,26 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             } catch(e) {alert(e);};
 
 
-        },
+        }, // end of get_Collection_list
+
+        get_collection_stats: function(){
+            var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
+            var params = '';
+            if (params != '') { params  = '?' + params; };
+            try{
+            $.getJSON( url + 'collection/'+ this.options['database']  +'/' + this.options['collection'] + '/stats/' + params,
+                function(data){
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                    $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_stats_received', this, {'data' :  data['data'] } );
+                        
+                }
+            ); //end of $.getJSON
+                
+            } catch(e) {alert(e);};
+
+
+        }, // end of get_Collection_list
+
 
    signal: function(signal_name, signal_source, signal_data ) {
         //alert('mongo ajax received signal' + signal_name);
@@ -392,7 +402,7 @@ $('#mongo_ui_container').append("<div id='mongo_ajax'></div>");
 $('#mongo_ajax').fom_object_mongo_ajax({'host':'localhost', 'port': 27017, 'database' : null, 'collection' : null });
 //init console
 $('#mongo_ui_container').append("<div id='mongo_console'></div>");
-$('#mongo_console').fom_console();
+//$('#mongo_console').fom_console();
 //initialize all plugins
 fom_init_plugins();
 //tell everybody we are starting the party

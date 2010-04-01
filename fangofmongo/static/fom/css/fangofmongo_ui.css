@@ -9,20 +9,23 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 
 .fom_ui_list_item {
     text-align:center; padding: 5px;
-    border-color: black;
+    border-color: orange;
     border-size:1px;
     border-style: solid;
     margin-top: 1px;
-    -webkit-border-radius: 20px; /* Safari, Chrome */
-    -khtml-border-radius: 20px;    /* Konqueror */
-    -moz-border-radius: 20px; /* Firefox */
-    border-radius: 20px;
+    -webkit-border-radius: 12px; /* Safari, Chrome */
+    -khtml-border-radius: 12px;    /* Konqueror */
+    -moz-border-radius: 12px; /* Firefox */
+    border-radius: 12px;
 
 
 
 }
-.fom_ui_list_item:hover { background-color: blue; }
+
+.fom_ui_list_items {width: 100%; height: 70%;  overflow: auto;}
+.fom_ui_list_item:hover { background-color: #89CFF0; } /* babyblue */
 .fom_ui_list_item_selected { background-color:orange;}
+
 #mongo_ui_header { color: white; background-color: orange; font-size: 20pt; }
 #mongo_ui_header_tools > div { display: inline; font-size: 10pt; color: white; background-color: darkorange; }
 #mongo_ui_header_tools > div :hover { color: red; font-size: 30pt; } 

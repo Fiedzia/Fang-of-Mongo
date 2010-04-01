@@ -4,7 +4,7 @@ from django.utils import simplejson as json
 
 import re
 import pymongo
-
+from pymongo import json_util
 import handle_plugins
 from exceptions import CmdException
 
@@ -52,7 +52,7 @@ def list_databases(request, host, port):
                 else:
                     dbnames = [dbname for dbname in dbnames if request.GET['search'] in dbname]
         dbnames.sort()
-        json_response = json.dumps({'data':dbnames})
+        json_response = json.dumps({'data':dbnames}, default=pymongo.json_util.default)
     except (Exception), e:
          json_response = (json.dumps({'error': repr(e)}))
         
@@ -78,7 +78,63 @@ def list_collections(request, host, port, dbname):
                 else:
                     collnames = [collname for collname in collnames if request.GET['search'] in collname]
         collnames.sort()
-        json_response = json.dumps({'data':collnames})
+        json_response = json.dumps({'data':collnames}, default=pymongo.json_util.default)
+    except (Exception), e:
+         json_response = json.dumps({'error': repr(e)})
+        
+    return HttpResponse(json_response, mimetype='application/json')
+
+
+#@auth_required
+def coll_stats(request, host, port, dbname, collname):
+    """
+    From GET take:  login, password : database credentials(optional, currently ignored)
+
+    Return json with basic collection info
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        db = conn[dbname]
+        coll = db[collname];
+        resp = {}
+        resp['count'] = coll.count();
+        resp['indexes'] = coll.index_information()
+        resp['options'] = coll.options()
+        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+    except (Exception), e:
+         json_response = json.dumps({'error': repr(e)})
+        
+    return HttpResponse(json_response, mimetype='application/json')
+
+#@auth_required
+def coll_query(request, host, port, dbname, collname):
+    """
+    From GET take:  login, password : database credentials(optional, currently ignored)
+         q -  mongo query as JSON dictionary
+         sort - sort info (JSON dictionary)
+         limit
+         skip
+         fields
+
+    Return json with requested data or error
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        db = conn[dbname]
+        coll = db[collname];
+        resp = {}
+        query = json.loads(request.GET['q'])
+        limit = 10
+        if 'limit' in request.GET:
+            limit = int(request.GET['limit'])
+        skip = 0
+        if 'skip' in request.GET:
+            skip = int(request.GET['skip'])
+       
+        cur = coll.find(query, skip = skip, limit = limit)
+        resp = [a for a in cur]
+
+        json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
     except (Exception), e:
          json_response = json.dumps({'error': repr(e)})
         
@@ -91,13 +147,12 @@ def exec_cmd(request):
     """
     error_msg = None
     cmd = None
-    print 'DATA:', request.POST
     try:
         if not 'cmd' in request.POST:
             raise CmdException('No command given')
         cmd = request.POST['cmd']
         if cmd == 'help':
-            json_response = json.dumps({'data': 'some help', 'type' : 'html'})
+            json_response = json.dumps({'data': 'some help', 'type' : 'html'},  default=pymongo.json_util.default)
         
     except (CmdException,), e:
         json_response = json.dumps({'error': e.message})

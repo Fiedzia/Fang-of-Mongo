@@ -6,5 +6,8 @@ urlpatterns = patterns('',
     (r'ui/mongo/(?P<host>.+)/(?P<port>\d+)/$',  'fom.views.ui_page'),
     (r'rest/mongo/(?P<host>.+)/(?P<port>\d+)/databases/$',  'fom.views.list_databases'),
     (r'rest/mongo/(?P<host>.+)/(?P<port>\d+)/collections/(?P<dbname>.+)/$',  'fom.views.list_collections'),
+    (r'rest/mongo/(?P<host>.+)/(?P<port>\d+)/collection/(?P<dbname>.+)/(?P<collname>.+)/stats/$',  'fom.views.coll_stats'),
+    (r'rest/mongo/(?P<host>.+)/(?P<port>\d+)/collection/(?P<dbname>.+)/(?P<collname>.+)/query/$',  'fom.views.coll_query'),
+
     (r'rest/mongo/cmd/$',  'fom.views.exec_cmd'),
 )

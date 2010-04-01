@@ -22,7 +22,7 @@ Fom_coll_list = $.extend({}, $.ui.fom_object.prototype, {
         var this_obj = this;    
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         $('#mongo_ui_container').append("<div id='mongo_ui_collection_list'></div>");
-        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 450] });
+        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 550] });
         $('#mongo_ui_collection_list').bind('search', function(e, query){ this_obj.search(query); });
         $('#mongo_ui_collection_list').bind('fom_item_selected', function(e, collname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': collname } ); });
     }, 
