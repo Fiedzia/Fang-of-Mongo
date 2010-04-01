@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<plugins>
+<!-- Collection list  -->
+  <plugin>
+    <!-- Plugin info -->
+    <info>
+      <name>Mongo collection info and data</name>
+      <author>Maciej Dziardziel (maciejdziardziel@wp.pl)</author>
+      <description>Show collection date and information</description>
+      <version>1.0</version>
+    </info>
+    <!-- Plugin code and resources -->
+    <resources>
+      <css>
+      <![CDATA[
+        <style type="text/css">
+        #mongo_ui_coll_info_stats_indexes {white-space: pre-wrap;}
+        </style>
+      ]]>
+      </css>
+      <js>
+      <![CDATA[
+      
+Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        var this_obj = this;
+        this.dialog_id = this.options['div_id'] + '_dialog';
+        $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
+        //$('#mongo_ui_container').append("<div id='mongo_ui_coll_info'></div><div id='mongo_ui_coll_info_dialog'><div id='mongo_ui_coll_info_stats'>Documents in collection: <span id='mongo_ui_coll_info_stats_count'/><br/>Indexes: <span id='mongo_ui_coll_info_stats_indexes'/><br/>Options: <span id='mongo_ui_coll_info_stats_options'/></div></div>");
+
+        $("#mongo_ui_coll_info_tabs").tabs();
+        //dialog - collection info
+        $('#' + this.options['div_id'] + '_dialog').dialog({
+            autoOpen: true,
+            height: 500,
+            width: 400,
+            modal: false,
+            closeOnEscape: false,
+            buttons: {},
+            title: 'Collection info',
+            position : [220,100],
+
+        }); //end of dialog
+
+
+        //$('#mongo_ui_coll_info').fom_ui_list({'title':'Collection', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 450] });
+        //$('#mongo_ui_coll_info').bind('search', function(e, query){ this_obj.search(query); });
+        //$('#mongo_ui_coll_info').bind('fom_item_selected', function(e, collname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': collname } ); });
+    }, 
+        
+   signal: function(signal_name, signal_source, signal_data ) {
+        //alert('colls received signal' + signal_name);
+        if (signal_name == 'database_selected')
+        {
+        }        
+        else if ( signal_name == 'collection_selected')
+        {
+            var db_name = $('#mongo_ajax').fom_object_mongo_ajax('option','database');
+            $('#mongo_ui_coll_info_dialog').dialog('option','title','Collection info [' + db_name + ' -> ' + signal_data['collection'] + ']');
+            $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+        }
+        else if ( signal_name == 'collection_stats_received')
+        {
+            $('#' + 'mongo_ui_coll_info_stats_count').html(signal_data['data']['count']);
+            $('#' + 'mongo_ui_coll_info_stats_indexes').html(JSON.stringify(signal_data['data']['indexes'], null, 4 ));
+            $('#' + 'mongo_ui_coll_info_stats_options').html(JSON.stringify(signal_data['data']['options'], null, 4));
+        }
+    },    
+   //search: function(query){
+   //    $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
+   //},
+    destroy: function(){ 
+        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
+    }, 
+}); 
+$.widget("ui.fom_object_coll_info", Fom_coll_info); 
+
+//init collection list
+$('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_info'});
+
+//end of collection list
+
+
+      ]]>
+      </js>
+      <html>
+      <![CDATA[   
+        <div id='mongo_ui_coll_info'>
+          <div id='mongo_ui_coll_info_dialog'>
+          
+            <div id="mongo_ui_coll_info_tabs">
+              <ul>
+                <li><a href="#mongo_ui_coll_info_tab1">Stats</a></li>
+                <li><a href="#mongo_ui_coll_info_tab2">Data</a></li>
+              </ul>
+              <div id="mongo_ui_coll_info_tab1">
+                <div id='mongo_ui_coll_info_stats'>
+                  Documents in collection: <span id='mongo_ui_coll_info_stats_count'></span><br/>
+                  Indexes: <span id='mongo_ui_coll_info_stats_indexes'></span><br/>
+                  Options: <span id='mongo_ui_coll_info_stats_options'></span>
+                </div>
+              </div>
+              <div id="mongo_ui_coll_info_tab2">
+                <div id='mongo_ui_coll_info_data'>
+                  <button type="button" onclick="alert(1);" >Load</button>
+                  <div id='mongo_ui_coll_info_data'></div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      ]]>
+      </html>
+    </resources>
+  </plugin>
+
+</plugins>
+
