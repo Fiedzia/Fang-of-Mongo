@@ -6,7 +6,7 @@
     <info>
       <name>Mongo collection info and data</name>
       <author>Maciej Dziardziel (maciejdziardziel@wp.pl)</author>
-      <description>Show collection date and information</description>
+      <description>Show collection content and information</description>
       <version>1.0</version>
     </info>
     <!-- Plugin code and resources -->
@@ -67,6 +67,21 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
             $('#' + 'mongo_ui_coll_info_stats_options').html(JSON.stringify(signal_data['data']['options'], null, 4));
         }
     },    
+    load_data: function(query, skip, limit)
+    {
+        if (!query) query = {};
+        if (!skip) skip = 0;
+        if(!limit) limit = 10;
+        $('#mongo_ajax').fom_object_mongo_ajax('get_data', query, limit, skip, this.data_loaded);
+        
+
+        
+    },
+    data_loaded: function(data)
+    {
+        if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+        $('#mongo_ui_coll_info_data_container').html(JSON.stringify(data['data'], null, '\n'));
+    },
    //search: function(query){
    //    $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
    //},
@@ -103,8 +118,8 @@ $('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_inf
               </div>
               <div id="mongo_ui_coll_info_tab2">
                 <div id='mongo_ui_coll_info_data'>
-                  <button type="button" onclick="alert(1);" >Load</button>
-                  <div id='mongo_ui_coll_info_data'></div>
+                  <button type="button" onclick="$('#mongo_ui_header_tools_coll').fom_object_coll_info('load_data');" >Load</button>
+                  <div id='mongo_ui_coll_info_data_container'></div>
                 </div>
               </div>
 
