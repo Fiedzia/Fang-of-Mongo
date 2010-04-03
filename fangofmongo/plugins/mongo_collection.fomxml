@@ -26,10 +26,13 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         $.ui.fom_object.prototype._init.call(this); // call the original function 
         var this_obj = this;
         this.dialog_id = this.options['div_id'] + '_dialog';
+        if (! ('show_data' in this.options)) this.options['show_data'] = false;
+        if (! ('show_stats' in this.options)) this.options['show_stats'] = false;
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
-        //$('#mongo_ui_container').append("<div id='mongo_ui_coll_info'></div><div id='mongo_ui_coll_info_dialog'><div id='mongo_ui_coll_info_stats'>Documents in collection: <span id='mongo_ui_coll_info_stats_count'/><br/>Indexes: <span id='mongo_ui_coll_info_stats_indexes'/><br/>Options: <span id='mongo_ui_coll_info_stats_options'/></div></div>");
+        
 
-        $("#mongo_ui_coll_info_tabs").tabs();
+        $("#mongo_ui_coll_info_stats_btn").button({});
+        $("#mongo_ui_coll_info_data_btn").button();
         //dialog - collection info
         $('#' + this.options['div_id'] + '_dialog').dialog({
             autoOpen: true,
@@ -58,7 +61,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         {
             var db_name = $('#mongo_ajax').fom_object_mongo_ajax('option','database');
             $('#mongo_ui_coll_info_dialog').dialog('option','title','Collection info [' + db_name + ' -> ' + signal_data['collection'] + ']');
-            $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+            if($('#mongo_ui_coll_info_stats').is(':visible'))
+              $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
         }
         else if ( signal_name == 'collection_stats_received')
         {
@@ -104,26 +108,20 @@ $('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_inf
         <div id='mongo_ui_coll_info'>
           <div id='mongo_ui_coll_info_dialog'>
           
-            <div id="mongo_ui_coll_info_tabs">
-              <ul>
-                <li><a href="#mongo_ui_coll_info_tab1">Stats</a></li>
-                <li><a href="#mongo_ui_coll_info_tab2">Data</a></li>
-              </ul>
-              <div id="mongo_ui_coll_info_tab1">
+            <button type="button" id="mongo_ui_coll_info_stats_btn" onclick="$('#mongo_ui_coll_info_stats').toggle(); if($('#mongo_ui_coll_info_stats').is(':visible')) $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','',''); ">Stats</button>
+
                 <div id='mongo_ui_coll_info_stats'>
                   Documents in collection: <span id='mongo_ui_coll_info_stats_count'></span><br/>
                   Indexes: <span id='mongo_ui_coll_info_stats_indexes'></span><br/>
                   Options: <span id='mongo_ui_coll_info_stats_options'></span>
                 </div>
-              </div>
-              <div id="mongo_ui_coll_info_tab2">
+            <button type="button"  id="mongo_ui_coll_info_data_btn" onclick="$('#mongo_ui_coll_info_data').toggle();">Data</button>
                 <div id='mongo_ui_coll_info_data'>
                   <button type="button" onclick="$('#mongo_ui_header_tools_coll').fom_object_coll_info('load_data');" >Load</button>
                   <div id='mongo_ui_coll_info_data_container'></div>
                 </div>
-              </div>
 
-            </div>
+
 
           </div>
         </div>
