@@ -1,7 +1,34 @@
 Fang of Mongo - web based user interface for MongoDB build with django and jquery.
 
+It will allow you to explore content of mongodb with simple but (hopefully) pleasant
+user interface.
+
+Curren status:
+
+Fang of mongo is actually rather proof of concept for mongo ui then anything working properly.
+Expect all kinds of bugs and limitations. 
+
 For installation instruction, see INSTALL file
 To get the idea of code internals, see code_hacking.txt
 
+Project goals:
+
+  allow users to easily explore mongdb content
+  and any metainformation it may provide
+
+Roadmap (in order of importance):
+
+  - display collection content in nicely formatted way
+  - allow to easily filter and sort data
+  - unittests
+  - data edition
+  - collection and db operations (create, remove)
+  - data export to usefull format (html, json, csv, xml)
+  - database operation (defining/creating indexes, setting replication,
+    sync time and whatever is possible)
+  - user management
+  - implement some form of mongo console
+
+  
 
 author: Maciej Dziardziel (maciejdziardziel@wp.pl)
