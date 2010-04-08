@@ -226,7 +226,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         this.search_id = this.options['div_id'] + '_search';
         this.clear_id = this.options['div_id'] + '_clear';
         
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div class='fom_ui_list_items'><div id='" + this.item_list_id + "'></div></div></div>");
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div class='fom_ui_note'></div><div class='fom_ui_list_items'><div id='" + this.item_list_id + "'></div></div></div>");
         var my_id = '#' + this.options['div_id'];
         var search_id = this.search_id;
         var clear_id = this.clear_id;
@@ -243,18 +243,16 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
             title: this.options['title'],
             buttons: {},
             position : this.options['position'],
-            //fix for jqueryui - remember dialog position between open/close. Already fixed in jqueryui trunk
-            /*beforeclose: function(){
-                $(this).dialog('option', 'position', [$(this).offset().left, $(this).offset().top]);
-                $(this).dialog('option', 'width', $(this).width());
-                $(this).dialog('option', 'height', $(this).height());
-            },*/
+
 
      }); //end of dialog
 
      $('#' + this.dialog_id).dialog('open');
      var dialog_id = this.dialog_id
      $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
+     $('#' + this.search_id).button();
+     $('#' + this.clear_id).button();
+
      //set title properly when appending filter there
      $('#' + dialog_id).dialog('option','title_prefix',this.options['title']);
 
@@ -323,7 +321,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             $.getJSON( url + 'databases/' + params,
                 function(data, search, method){
                 
-                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                    if ( 'error' in data ) { alert('error1: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
 
                 });
@@ -341,7 +339,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             try{
             $.getJSON( url + 'collections/'+ this.options['database']  +'/' + params,
                 function(data,search, method){
-                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                    if ( 'error' in data ) { alert('error2: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
                         
                 }
@@ -359,7 +357,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             try{
             $.getJSON( url + 'collection/' + this.options['database']  +'/' + this.options['collection'] + '/stats/' + params,
                 function(data){
-                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                    if ( 'error' in data ) { alert('error3: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_stats_received', this, {'data' :  data['data'] } );
                         
                 }

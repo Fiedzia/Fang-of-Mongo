@@ -26,6 +26,71 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 .fom_ui_list_item:hover { background-color: #89CFF0; } /* babyblue */
 .fom_ui_list_item_selected { background-color:orange;}
 
+.fom_ui_json_data > .fom_ui_json_container:nth-child(even) > .fom_ui_json_value_document,
+.fom_ui_json_data > .fom_ui_json_container:nth-child(even) > .fom_ui_json_value_oid
+{
+    background-color: lightblue;
+}
+
+.fom_ui_json_toggle {
+    display: inline-block;
+    width:12px;
+    /*padding-left: 5px;
+    padding-right: 5px;*/
+    text-align:center;
+    background-color: white;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #89CFF0; /* baby-blue */
+}
+
+.fom_ui_json_value_oid,
+.fom_ui_json_key, 
+.fom_ui_json_value_string, 
+.fom_ui_json_value_number, 
+.fom_ui_json_value_boolean, 
+.fom_ui_json_value_date, 
+.fom_ui_json_value_oid {
+    display: inline;
+    /*background-color: white;*/
+}
+
+
+.fom_ui_json_id {
+}
+.fom_ui_json_key {
+}
+.fom_ui_json_value_string {
+}
+.fom_ui_json_value_number {
+}
+.fom_ui_json_value_boolean {
+}
+
+.fom_ui_json_value_dict {
+    margin-left:10px;
+    /*background-color: white;*/
+    border-style: solid;
+    border-width: 1px;
+    border-color: pink;
+
+}
+
+
+.fom_ui_json_value_document {
+    margin-left:10px;
+    /*background-color: white;*/
+    border-style: solid;
+    border-width: 1px;
+    border-color: navy;
+    padding: 5px;
+    -webkit-border-radius: 12px; /* Safari, Chrome */
+    -khtml-border-radius: 12px;    /* Konqueror */
+    -moz-border-radius: 12px; /* Firefox */
+    border-radius: 12px;
+    font-size: 12pt;
+}
+
 #mongo_ui_header { color: white; background-color: orange; font-size: 20pt; }
 #mongo_ui_header_tools > div { display: inline; font-size: 10pt; color: white; background-color: darkorange; }
 #mongo_ui_header_tools > div :hover { color: red; font-size: 30pt; } 
