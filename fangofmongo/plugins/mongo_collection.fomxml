@@ -6,7 +6,7 @@
     <info>
       <name>Mongo collection info and data</name>
       <author>Maciej Dziardziel (maciejdziardziel@wp.pl)</author>
-      <description>Show collection content and information</description>
+      <description>Show collection content and metainformation</description>
       <version>1.0</version>
     </info>
     <!-- Plugin code and resources -->
@@ -15,6 +15,7 @@
       <![CDATA[
         <style type="text/css">
         #mongo_ui_coll_info_stats_indexes {white-space: pre-wrap;}
+        #mongo_ui_coll_info_paginator *  { display: inline };
         </style>
       ]]>
       </css>
@@ -30,14 +31,39 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         if (! ('show_stats' in this.options)) this.options['show_stats'] = false;
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         
+        this.options['query'] = {};
+        this.options['limit'] = 10;
+        this.options['page'] = 0;
+        
 
         $("#mongo_ui_coll_info_stats_btn").button({});
         $("#mongo_ui_coll_info_data_btn").button();
+        $('#mongo_ui_coll_info_data_expand').button();
+        $('#mongo_ui_coll_info_data_next').button();
+        $('#mongo_ui_coll_info_data_prev').button();
+        $('#mongo_ui_coll_info_data_next').click(function(){ this_obj.load_next(); });
+        $('#mongo_ui_coll_info_data_prev').click(function(){ this_obj.load_prev(); });
+        $('#mongo_ui_coll_info_data_expand').click(function(){
+            if ($(this).is(':checked')) {
+                $(this).next().html('collapse');
+                $('.fom_ui_json_data').children('.fom_ui_json_container').children('.fom_ui_json_value_document').show();
+                $('.fom_ui_json_data').children('.fom_ui_json_container').children('.fom_ui_json_toggle').html('-');
+            } else {
+                $(this).next().html('expand');
+                $('.fom_ui_json_data').children('.fom_ui_json_container').children('.fom_ui_json_value_document').hide();
+                $('.fom_ui_json_data').children('.fom_ui_json_container').children('.fom_ui_json_toggle').html('+');
+            };
+        });
+        
+        $('#mongo_ui_coll_info_data_page').change(function()  { try { this_obj.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val() -1 ); } catch(e) { this.options['page'] = 0; };  });
+        $('#mongo_ui_coll_info_data_limit').change(function() { try { this_obj.options['limit'] = parseInt($('#mongo_ui_coll_info_data_limit').val()); } catch(e) { this.options['limit'] = 10; };  });
+        
+        $('#mongo_ui_coll_info_stats').hide();
         //dialog - collection info
         $('#' + this.options['div_id'] + '_dialog').dialog({
             autoOpen: true,
-            height: 500,
-            width: 400,
+            height: 650,
+            width: 550,
             modal: false,
             closeOnEscape: false,
             buttons: {},
@@ -47,9 +73,16 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         }); //end of dialog
 
 
-        //$('#mongo_ui_coll_info').fom_ui_list({'title':'Collection', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 450] });
-        //$('#mongo_ui_coll_info').bind('search', function(e, query){ this_obj.search(query); });
-        //$('#mongo_ui_coll_info').bind('fom_item_selected', function(e, collname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': collname } ); });
+        //menu button
+        $('#mongo_ui_menu').append('<button id="mongo_ui_coll_info_menu_btn">Collection info</button>');
+        $('#mongo_ui_coll_info_menu_btn').button();
+        var dialog_id = '#' + this.dialog_id;
+        $('#mongo_ui_coll_info_menu_btn').click(
+            function () { 
+                $(dialog_id).dialog('isOpen')? $(dialog_id).dialog('close') : $(dialog_id).dialog('open');
+            }
+        );
+
     }, 
         
    signal: function(signal_name, signal_source, signal_data ) {
@@ -60,31 +93,57 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         else if ( signal_name == 'collection_selected')
         {
             var db_name = $('#mongo_ajax').fom_object_mongo_ajax('option','database');
-            $('#mongo_ui_coll_info_dialog').dialog('option','title','Collection info [' + db_name + ' -> ' + signal_data['collection'] + ']');
+            $('#mongo_ui_coll_info_dialog').dialog(
+                'option','title','Collection info [' + db_name + ' -> ' + signal_data['collection'] + ']'
+            );
+            $('#mongo_ui_coll_info_data_page').val('1');
+            this.options['page'] = 0;
+            
             if($('#mongo_ui_coll_info_stats').is(':visible'))
-              $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+                $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+            
+            if($('#mongo_ui_coll_info_data').is(':visible'))
+                this.load_data(null, null, null);
         }
         else if ( signal_name == 'collection_stats_received')
         {
             $('#' + 'mongo_ui_coll_info_stats_count').html(signal_data['data']['count']);
             $('#' + 'mongo_ui_coll_info_stats_indexes').html(JSON.stringify(signal_data['data']['indexes'], null, 4 ));
-            $('#' + 'mongo_ui_coll_info_stats_options').html(JSON.stringify(signal_data['data']['options'], null, 4));
+            //$('#' + 'mongo_ui_coll_info_stats_options').html(JSON.stringify(signal_data['data']['options'], null, 4));
+            $('#' + 'mongo_ui_coll_info_stats_options').html(format_mongo_json_data(signal_data['data']['options'], null, 4));
+ 
         }
     },    
-    load_data: function(query, skip, limit)
+    load_data: function(query)
     {
         if (!query) query = {};
-        if (!skip) skip = 0;
-        if(!limit) limit = 10;
-        $('#mongo_ajax').fom_object_mongo_ajax('get_data', query, limit, skip, this.data_loaded);
-        
-
-        
+        //if (!skip) skip = 0;
+        //if(!limit) limit = 10;
+        $('#mongo_ajax').fom_object_mongo_ajax('get_data', query, this.options['limit'], this.options['page'] * this.options['limit'], this.data_loaded);
     },
+    load_next: function()
+    {
+        $('#mongo_ui_coll_info_data_page').val( parseInt($('#mongo_ui_coll_info_data_page').val()) + 1 );
+        this.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val()) -1 ;
+        this.load_data();
+    },
+    load_prev: function()
+    {
+        if(this.options['page'] > 0 )
+        {
+            $('#mongo_ui_coll_info_data_page').val( parseInt($('#mongo_ui_coll_info_data_page').val()) - 1 );
+            this.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val()) -1 ;
+            this.load_data();    
+        }
+    },
+    
     data_loaded: function(data)
     {
         if ( 'error' in data ) { alert('error: ' + data['error']); return; }
-        $('#mongo_ui_coll_info_data_container').html(JSON.stringify(data['data'], null, '\n'));
+        $('#mongo_ui_coll_info_data_container').html(format_mongo_json_data(data['data']));
+        add_json_events($('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
+        
+        
     },
    //search: function(query){
    //    $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
@@ -98,7 +157,7 @@ $.widget("ui.fom_object_coll_info", Fom_coll_info);
 //init collection list
 $('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_info'});
 
-//end of collection list
+//end of collection info
 
 
       ]]>
@@ -117,7 +176,14 @@ $('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_inf
                 </div>
             <button type="button"  id="mongo_ui_coll_info_data_btn" onclick="$('#mongo_ui_coll_info_data').toggle();">Data</button>
                 <div id='mongo_ui_coll_info_data'>
-                  <button type="button" onclick="$('#mongo_ui_header_tools_coll').fom_object_coll_info('load_data');" >Load</button>
+                    <div id='mongo_ui_coll_info_paginator'>
+                        <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
+                        Per page: <input id="mongo_ui_coll_info_data_limit" type="text" value="10"/>
+                        Page: <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
+                        <button id="mongo_ui_coll_info_data_prev">Prev</button>
+                        <button id="mongo_ui_coll_info_data_next">Next</button>
+                    </div>
+
                   <div id='mongo_ui_coll_info_data_container'></div>
                 </div>
 
