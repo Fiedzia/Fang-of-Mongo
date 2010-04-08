@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.utils import simplejson as json
@@ -133,7 +134,6 @@ def coll_query(request, host, port, dbname, collname):
        
         cur = coll.find(query, skip = skip, limit = limit)
         resp = [a for a in cur]
-
         json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
     except (Exception), e:
          json_response = json.dumps({'error': repr(e)})
