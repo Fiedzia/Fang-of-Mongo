@@ -55,8 +55,10 @@ def list_databases(request, host, port):
         dbnames.sort()
         json_response = json.dumps({'data':dbnames}, default=pymongo.json_util.default)
     except (Exception), e:
-         json_response = (json.dumps({'error': repr(e)}))
-        
+        json_response = (json.dumps({'error': repr(e)}))
+    finally:
+        conn.disconnect()
+       
     return HttpResponse(json_response, mimetype='application/json')
 
 #@auth_required
@@ -81,8 +83,10 @@ def list_collections(request, host, port, dbname):
         collnames.sort()
         json_response = json.dumps({'data':collnames}, default=pymongo.json_util.default)
     except (Exception), e:
-         json_response = json.dumps({'error': repr(e)})
-        
+        json_response = json.dumps({'error': repr(e)})
+    finally:
+        conn.disconnect()
+
     return HttpResponse(json_response, mimetype='application/json')
 
 
@@ -103,7 +107,9 @@ def coll_stats(request, host, port, dbname, collname):
         resp['options'] = coll.options()
         json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
     except (Exception), e:
-         json_response = json.dumps({'error': repr(e)})
+        json_response = json.dumps({'error': repr(e)})
+     finally:
+        conn.disconnect()
         
     return HttpResponse(json_response, mimetype='application/json')
 
@@ -140,7 +146,9 @@ def coll_query(request, host, port, dbname, collname):
         resp = [a for a in cur]
         json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
     except (Exception), e:
-         json_response = json.dumps({'error': repr(e)})
+        json_response = json.dumps({'error': repr(e)})
+    finally:
+        conn.disconnect()
         
     return HttpResponse(json_response, mimetype='application/json')
 
