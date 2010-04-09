@@ -68,7 +68,7 @@ function render_value(value)
             for(var key in value)
             {
                 resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' -&gt; ';
-                resp += render_value(value[key]);
+                resp += render_value(value[key]) + '<br/>';
             }
             resp += '</div>';
             return resp;
@@ -90,7 +90,10 @@ function format_mongo_json_data(json_data_array)
         resp += '<div class="fom_ui_json_container">';
         //resp += '<div class="fom_ui_json_toggle" onclick="$(this).next().next().toggle(); $(this).html($(this).next().next().is(\':visible\')?\'-\':\'+\');">+</div>';
         resp += '<div class="fom_ui_json_toggle">+</div>';
-        resp += '<div class="fom_ui_json_value_oid">' + escape_html(JSON.stringify(json_data_array[i]['_id']['$oid'])) + '</div>';
+        if(!('_id' in json_data_array[i]))
+            resp += '<div class="fom_ui_json_value_missing">value missing</div>';
+        else
+            resp += '<div class="fom_ui_json_value_oid">' + (render_value(json_data_array[i]['_id'])) + '</div>';
         resp += '<div class="fom_ui_json_value_document">';
         
         for(var key in json_data_array[i])
