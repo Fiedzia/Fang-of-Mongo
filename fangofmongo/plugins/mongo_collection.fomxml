@@ -61,7 +61,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         
         $('#mongo_ui_coll_info_data_page').change(function()  { try { this_obj.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val() -1 ); } catch(e) { this_obj.options['page'] = 0; };  });
         $('#mongo_ui_coll_info_data_limit').change(function() { try { this_obj.options['limit'] = parseInt($('#mongo_ui_coll_info_data_limit').val()); } catch(e) { this_obj.option['limit'] = 10; };  });
-        $('#mongo_ui_coll_info_data_sort').change(function() { try {  alert($('#mongo_ui_coll_info_data_sort').val()); this_obj.options['sort'] = $.parseJSON($('#mongo_ui_coll_info_data_sort').val()); } catch(e) { alert('sort syntax error' + e); this_obj.options['sort'] = null; };  });
+        $('#mongo_ui_coll_info_data_sort').change(function() { try {  this_obj.options['sort'] = $.parseJSON($('#mongo_ui_coll_info_data_sort').val()); } catch(e) { alert('sort syntax error' + e); this_obj.options['sort'] = null; };  });
         
         $('#mongo_ui_coll_info_stats').hide();
         //dialog - collection info
@@ -95,6 +95,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         //alert('colls received signal' + signal_name);
         if (signal_name == 'database_selected')
         {
+            $('#mongo_ui_coll_info_dialog').dialog('option', 'title', 'Collection info [no collection selected]');
+            $('#' + 'mongo_ui_coll_info_stats_count').html('');
+            $('#' + 'mongo_ui_coll_info_stats_indexes').html('');
+            $('#' + 'mongo_ui_coll_info_stats_options').html('');
+            $('#' + 'mongo_ui_coll_info_data_container').html('');
         }        
         else if ( signal_name == 'collection_selected')
         {
@@ -116,10 +121,10 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         {
             $('#' + 'mongo_ui_coll_info_stats_count').html(signal_data['data']['count']);
             $('#' + 'mongo_ui_coll_info_stats_indexes').html(JSON.stringify(signal_data['data']['indexes'], null, 4 ));
-            //$('#' + 'mongo_ui_coll_info_stats_options').html(JSON.stringify(signal_data['data']['options'], null, 4));
             $('#' + 'mongo_ui_coll_info_stats_options').html(format_mongo_json_data(signal_data['data']['options'], null, 4));
  
         }
+
     },    
     load_data: function()
     {
