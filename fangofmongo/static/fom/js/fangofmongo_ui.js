@@ -321,7 +321,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             $.getJSON( url + 'databases/' + params,
                 function(data, search, method){
                 
-                    if ( 'error' in data ) { alert('error1: ' + data['error']); return; }
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
 
                 });
@@ -339,7 +339,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             try{
             $.getJSON( url + 'collections/'+ this.options['database']  +'/' + params,
                 function(data,search, method){
-                    if ( 'error' in data ) { alert('error2: ' + data['error']); return; }
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
                         
                 }
@@ -357,7 +357,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             try{
             $.getJSON( url + 'collection/' + this.options['database']  +'/' + this.options['collection'] + '/stats/' + params,
                 function(data){
-                    if ( 'error' in data ) { alert('error3: ' + data['error']); return; }
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_stats_received', this, {'data' :  data['data'] } );
                         
                 }
