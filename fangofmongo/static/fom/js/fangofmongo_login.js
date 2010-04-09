@@ -20,7 +20,6 @@ function fom_init_login_form()
         //}
          
         $("#start_dialog").dialog({
-            bgiframe: true,
             autoOpen: false,
             height: 450,
             width: 400,

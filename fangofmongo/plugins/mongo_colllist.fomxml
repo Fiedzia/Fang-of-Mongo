@@ -5,7 +5,7 @@
     <!-- Plugin info -->
     <info>
       <name>Mongo collection list</name>
-      <author>Maciej Dziardziel (maciejdziardziel@wp.pl)</author>
+      <author>Maciej Dziardziel (fiedzia@gmail.com)</author>
       <description>Show list of collections</description>
       <version>1.0</version>
     </info>
@@ -22,11 +22,12 @@ Fom_coll_list = $.extend({}, $.ui.fom_object.prototype, {
         var this_obj = this;    
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         $('#mongo_ui_container').append("<div id='mongo_ui_collection_list'></div>");
-        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'tool_button_id' : 'mongo_ui_header_tools_coll','position':['left', 420] });
+        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'position':['left', 420] });
         $('#mongo_ui_collection_list').bind('search', function(e, query){ this_obj.search(query); });
         $('#mongo_ui_collection_list').bind('fom_item_selected', function(e, collname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': collname } ); });
         //menu button
-        $('#mongo_ui_menu').append('<button id="mongo_ui_collection_list_menu_btn">Collection list</button>');
+        $('#mongo_ui_menu').append('<input type="checkbox" id="mongo_ui_collection_list_menu_btn" checked="checked"/><label for="mongo_ui_collection_list_menu_btn">Collections list</label>');
+
         $('#mongo_ui_collection_list_menu_btn').button();
         var dialog_id = '#' + $('#mongo_ui_collection_list').fom_ui_list('option','div_id')+'_dialog';
         $('#mongo_ui_collection_list_menu_btn').click(function () { $(dialog_id).dialog('isOpen')? $(dialog_id).dialog('close') : $(dialog_id).dialog('open');});
@@ -55,7 +56,8 @@ Fom_coll_list = $.extend({}, $.ui.fom_object.prototype, {
 $.widget("ui.fom_object_colls", Fom_coll_list); 
 
 //init collection list
-$('#mongo_ui_header_tools_coll').fom_object_colls();
+$('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_list"></span>');
+$('#mongo_ui_header_tools_coll_list').fom_object_colls();
 
 //end of collection list
 
