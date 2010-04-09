@@ -126,13 +126,17 @@ def coll_query(request, host, port, dbname, collname):
         resp = {}
         query = json.loads(request.GET['q'])
         limit = 10
+        sort = None
         if 'limit' in request.GET:
             limit = int(request.GET['limit'])
         skip = 0
         if 'skip' in request.GET:
             skip = int(request.GET['skip'])
-       
+        if 'sort' in request.GET:
+            sort = json.loads(request.GET['sort'])
         cur = coll.find(query, skip = skip, limit = limit)
+        if sort:
+            cur = cur.sort(sort)
         resp = [a for a in cur]
         json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
     except (Exception), e:

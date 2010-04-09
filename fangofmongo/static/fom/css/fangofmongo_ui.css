@@ -50,22 +50,19 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 .fom_ui_json_value_number, 
 .fom_ui_json_value_boolean, 
 .fom_ui_json_value_date, 
-.fom_ui_json_value_oid {
+.fom_ui_json_value_oid,
+.fom_ui_json_value_missing
+{
     display: inline;
     /*background-color: white;*/
 }
 
-
-.fom_ui_json_id {
-}
-.fom_ui_json_key {
-}
-.fom_ui_json_value_string {
-}
-.fom_ui_json_value_number {
-}
-.fom_ui_json_value_boolean {
-}
+.fom_ui_json_value_missing { background-color: yellow; }
+.fom_ui_json_id {}
+.fom_ui_json_key {}
+.fom_ui_json_value_string {}
+.fom_ui_json_value_number {}
+.fom_ui_json_value_boolean {}
 
 .fom_ui_json_value_dict {
     margin-left:10px;
@@ -100,3 +97,5 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 #fom_dialog_db > div, #fom_dialog_coll > div  { font-size: 12pt; border: 4px; padding: 8px;}
 #fom_dialog_db > div :hover, #fom_dialog_coll > div :hover { background-color:orange; }
 
+#mongo_logo {position: absolute; left: 80%; top:10px; border-style: none;}
+#mongo_logo img {border-style: none;}

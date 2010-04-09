@@ -127,7 +127,7 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
 
      $('#' + this.dialog_id).dialog('open');
      var dialog_id = this.dialog_id;
-     $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
+     //$('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
 
     },
     
@@ -368,20 +368,22 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
 
         }, // end of get_Collection_stats
 
-        get_data: function(query, limit, skip, callback){ 
+        get_data: function(query, limit, skip, sorting, callback){ 
             var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
             var params = '';
             //params += 'query=' + JSON.stringify(query) + '&limit=' + limit + '&skip=' + skip;
             //if (params != '') { params  = '?' + params; }; 
-            
-            $.ajax({
-                url: url + 'collection/' + this.options['database']  + '/' + this.options['collection'] + '/query/' + params,
-                dataType: 'json',
-                data: {
+            query_data = {
                   q: JSON.stringify(query),
                   limit: limit,
                   skip: skip
-                },
+                };
+            if (sorting)
+                query_data['sort'] = JSON.stringify(sorting);
+            $.ajax({
+                url: url + 'collection/' + this.options['database']  + '/' + this.options['collection'] + '/query/' + params,
+                dataType: 'json',
+                data: query_data,
                 success: callback
             });
         }, //end of get_data
@@ -414,9 +416,9 @@ $.widget("ui.fom_object_mongo_ajax", Fom_mongo_ajax);
 //init bus
 $('#mongo_ui_header_tools_bus').fom_bus();
 $('#mongo_ui_container').append("<div id='mongo_ajax'></div>");
-$('#mongo_ajax').fom_object_mongo_ajax({'host':'localhost', 'port': 27017, 'database' : null, 'collection' : null });
+$('#mongo_ajax').fom_object_mongo_ajax({'host':connection_params['host'], 'port': connection_params['port'], 'database' : null, 'collection' : null });
 //init console
-$('#mongo_ui_container').append("<div id='mongo_console'></div>");
+//$('#mongo_ui_container').append("<div id='mongo_console'></div>");
 //$('#mongo_console').fom_console();
 //initialize all plugins
 fom_init_plugins();

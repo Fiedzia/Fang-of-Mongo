@@ -5,7 +5,7 @@
     <!-- Plugin info -->
     <info>
       <name>Mongo collection info and data</name>
-      <author>Maciej Dziardziel (maciejdziardziel@wp.pl)</author>
+      <author>Maciej Dziardziel (fiedzia@gmail.com)</author>
       <description>Show collection content and metainformation</description>
       <version>1.0</version>
     </info>
@@ -15,7 +15,10 @@
       <![CDATA[
         <style type="text/css">
         #mongo_ui_coll_info_stats_indexes {white-space: pre-wrap;}
-        #mongo_ui_coll_info_paginator *  { display: inline };
+        #mongo_ui_coll_info_paginator *  { display: inline }
+        #mongo_ui_coll_info_data_limit {width: 50px}
+        #mongo_ui_coll_info_data_page  {width: 50px}
+        #mongo_ui_coll_info_data_sort  {width: 50px}
         </style>
       ]]>
       </css>
@@ -34,6 +37,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         this.options['query'] = {};
         this.options['limit'] = 10;
         this.options['page'] = 0;
+        this.options['sort'] = null;
         
 
         $("#mongo_ui_coll_info_stats_btn").button({});
@@ -55,8 +59,9 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
             };
         });
         
-        $('#mongo_ui_coll_info_data_page').change(function()  { try { this_obj.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val() -1 ); } catch(e) { this.options['page'] = 0; };  });
-        $('#mongo_ui_coll_info_data_limit').change(function() { try { this_obj.options['limit'] = parseInt($('#mongo_ui_coll_info_data_limit').val()); } catch(e) { this.options['limit'] = 10; };  });
+        $('#mongo_ui_coll_info_data_page').change(function()  { try { this_obj.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val() -1 ); } catch(e) { this_obj.options['page'] = 0; };  });
+        $('#mongo_ui_coll_info_data_limit').change(function() { try { this_obj.options['limit'] = parseInt($('#mongo_ui_coll_info_data_limit').val()); } catch(e) { this_obj.option['limit'] = 10; };  });
+        $('#mongo_ui_coll_info_data_sort').change(function() { try {  alert($('#mongo_ui_coll_info_data_sort').val()); this_obj.options['sort'] = $.parseJSON($('#mongo_ui_coll_info_data_sort').val()); } catch(e) { alert('sort syntax error' + e); this_obj.options['sort'] = null; };  });
         
         $('#mongo_ui_coll_info_stats').hide();
         //dialog - collection info
@@ -74,7 +79,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
 
 
         //menu button
-        $('#mongo_ui_menu').append('<button id="mongo_ui_coll_info_menu_btn">Collection info</button>');
+        $('#mongo_ui_menu').append('<input type="checkbox" id="mongo_ui_coll_info_menu_btn" checked="checked"/><label for="mongo_ui_coll_info_menu_btn">Collection info</label>');
+
         $('#mongo_ui_coll_info_menu_btn').button();
         var dialog_id = '#' + this.dialog_id;
         $('#mongo_ui_coll_info_menu_btn').click(
@@ -98,12 +104,13 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
             );
             $('#mongo_ui_coll_info_data_page').val('1');
             this.options['page'] = 0;
+            this.options['query'] = {};
             
             if($('#mongo_ui_coll_info_stats').is(':visible'))
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
             
             if($('#mongo_ui_coll_info_data').is(':visible'))
-                this.load_data(null, null, null);
+                this.load_data();
         }
         else if ( signal_name == 'collection_stats_received')
         {
@@ -114,12 +121,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
  
         }
     },    
-    load_data: function(query)
+    load_data: function()
     {
-        if (!query) query = {};
-        //if (!skip) skip = 0;
+        //if (!query) query = {};
         //if(!limit) limit = 10;
-        $('#mongo_ajax').fom_object_mongo_ajax('get_data', query, this.options['limit'], this.options['page'] * this.options['limit'], this.data_loaded);
+        $('#mongo_ajax').fom_object_mongo_ajax('get_data', this.options['query'], this.options['limit'], this.options['page'] * this.options['limit'],this.options['sort'],  this.data_loaded);
     },
     load_next: function()
     {
@@ -154,8 +160,10 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
 }); 
 $.widget("ui.fom_object_coll_info", Fom_coll_info); 
 
+
 //init collection list
-$('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_info'});
+$('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_info"></span>');
+$('#mongo_ui_header_tools_coll_info').fom_object_coll_info({div_id:'mongo_ui_coll_info'});
 
 //end of collection info
 
@@ -180,6 +188,7 @@ $('#mongo_ui_header_tools_coll').fom_object_coll_info({div_id:'mongo_ui_coll_inf
                         <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
                         Per page: <input id="mongo_ui_coll_info_data_limit" type="text" value="10"/>
                         Page: <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
+                        Sort: <input id="mongo_ui_coll_info_data_sort" type="text" value=""/>
                         <button id="mongo_ui_coll_info_data_prev">Prev</button>
                         <button id="mongo_ui_coll_info_data_next">Next</button>
                     </div>
