@@ -108,7 +108,7 @@ def coll_stats(request, host, port, dbname, collname):
         json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
-     finally:
+    finally:
         conn.disconnect()
         
     return HttpResponse(json_response, mimetype='application/json')
