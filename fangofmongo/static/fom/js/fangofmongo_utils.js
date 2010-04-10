@@ -35,7 +35,10 @@ function add_json_events(node, options)
 
 
 
-function render_value(value)
+function render_json_value(value)
+/*
+ * format json value as html
+ */
 {
 
     if (value == null)
@@ -54,7 +57,7 @@ function render_value(value)
             resp = '<div class="fom_ui_json_value_array">';
             for(var i in value)
             {
-                resp += render_value(value[i]);
+                resp += render_json_value(value[i]);
             }               
             resp += '</div>';
             return resp; 
@@ -68,7 +71,7 @@ function render_value(value)
             for(var key in value)
             {
                 resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' -&gt; ';
-                resp += render_value(value[key]) + '<br/>';
+                resp += render_json_value(value[key]) + '<br/>';
             }
             resp += '</div>';
             return resp;
@@ -93,13 +96,13 @@ function format_mongo_json_data(json_data_array)
         if(!('_id' in json_data_array[i]))
             resp += '<div class="fom_ui_json_value_missing">value missing</div>';
         else
-            resp += '<div class="fom_ui_json_value_oid">' + (render_value(json_data_array[i]['_id'])) + '</div>';
+            resp += '<div class="fom_ui_json_value_oid">' + (render_json_value(json_data_array[i]['_id'])) + '</div>';
         resp += '<div class="fom_ui_json_value_document">';
         
         for(var key in json_data_array[i])
         {
             resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' -&gt; ';
-            resp += render_value(json_data_array[i][key]);
+            resp += render_json_value(json_data_array[i][key]);
             resp += '<br/>';
         }
         resp += '</div>'; //document
