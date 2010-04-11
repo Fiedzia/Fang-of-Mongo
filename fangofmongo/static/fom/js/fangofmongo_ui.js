@@ -1,5 +1,4 @@
-/* Fang of Mongo init function. So the world begins... */
-//$('#errors').ajaxError(function(){ $(this).append("<li>Error requesting page.</li>"); }); 
+/* Fang of Mongo init function */
 
 function fom_init_mongo_ui()
 /*
@@ -35,28 +34,25 @@ $.widget("ui.fom_object", {
    getters: "value length",
    defaults: {
      active: false,
-     hidden: true
+     //hidden: true
    }
  });
 //end of fom_object
 
-/*
-Fom_object2 = $.extend({}, $.ui.fom_object.prototype,{
+
+Fom_plugin = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
-        $.ui.fom_object.prototype._init.call(this); // call the original function 
-        alert('inherited init');
+        $.ui.fom_object.prototype._init.call(this); // call the original function
     }, 
-    destroy: function(){ 
-        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
-    }, 
+
 }); 
-$.widget("ui.fom_object2", Fom_object2); 
-*/
+$.widget("ui.fom_plugin", Fom_plugin); 
+
 
 
 /**
 *
-*       Data bus
+*       Message bus
 *
 */
 
@@ -70,25 +66,30 @@ Fom_bus = $.extend({}, $.ui.fom_object.prototype,{
     length: function ( ) { return this.listeners.length;  },
     active:  function ( ) { return this.active;  },
 
+    /* add listeners
+       params:
+           listener: fom_object
+    */
     add_listener: function(listener) {
         this.listeners[this.listeners.length] = listener;
     },
 
+    /* send signal
+       params:
+           signal_name: name of the signal 
+           signal_source: fom_object instance originating the signal
+           signal_data: json data related to signal (content depends on signal)
+    */
     signal: function(signal_name, signal_source, signal_data ) {
-        //alert('sending' + signal_name);
         $.ui.fom_object.prototype.signal.call(this);
         for ( var obj in this.listeners)
         {
             this.listeners[obj].signal(signal_name, signal_source, signal_data);
         };
     },
-
-    destroy: function(){ 
-        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
-    }, 
 }); 
 $.widget("ui.fom_bus", Fom_bus); 
-//end of data bus
+//end of message bus
 
 
 /**
@@ -96,7 +97,7 @@ $.widget("ui.fom_bus", Fom_bus);
 *       Console ui object
 *
 */
-
+/*
 Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function 
@@ -140,22 +141,19 @@ Fom_ui_console = $.extend({}, $.ui.fom_object.prototype,{
          };
      }, //end of reponse_error    
     
-    destroy: function(){ 
-        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
-    }, 
 }); 
 $.widget("ui.fom_ui_console", Fom_ui_console); 
 
 
 //end of console ui object
-
+*/
 
 /**
 *
 *       Console object
 *
 */
-
+/*
 Fom_console = $.extend({}, $.ui.fom_object.prototype, {
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function 
@@ -209,11 +207,12 @@ Fom_console = $.extend({}, $.ui.fom_object.prototype, {
 }); 
 $.widget("ui.fom_console", Fom_console); 
 //end of console
+*/
 
 /**
 *
 *       Item list ui object
-*
+*         - dialog displaying list of items, with ability to search
 */
 
 Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
@@ -279,29 +278,31 @@ $.widget("ui.fom_ui_list", Fom_item_list);
 
 //end of item list ui object
 
+
+
+
 /*
         DATABASE ACCESS
+            class which allows to access mongodb via ajax calls
 */
 
-
-
 Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {    
-//    $.widget("ui.fom_object_mongo_ajax", {
 
         _init: function() {
-        $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
+            $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         
             //this.host = null;
             //this.port = null;
             //this.collection = null;
             //this.database = null; },
-       },     
+       },   
+
         // process server response to exec_cmd
         process_response: function(caller_id, data) {
             caller_id.process_response(data);
-            //alert(caller_id);
         }, // end of process_reponse
         
+        /*  //this is intended to be use for console plugin
         exec_cmd: function(console_obj, cmd){
             var url = '/fangofmongo/rest/mongo/cmd/';
             var caller_id = console_obj;
@@ -309,13 +310,18 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
 
             $.post(url, {'cmd':'help'}, function(data){ my_console.process_response(caller_id, data); }, "json");
             
-        }, //end of exec_cmd:
+        }, //end of exec_cmd:*/
         
+        /* Get list of databases from mongo server
+           params:
+               search (string, optional): text to search
+               method (string, optional): search method, either null (text search) or 're' (search will be interpreted as regular expression)
+        */
         get_db_list: function(search, method){
-            var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
             var params = '';
-            if (search != '') { params += 'search=' + search; };
-            if (method != '') { params += '&method=' + method; };
+            if (search != '') { params += 'search=' + encodeURIComponent(search); };
+            if (method != '') { params += '&method=' + encodeURIComponent(method); };
             if (params != '') { params  = '?' + params; };
             //alert('json url: ' + url+'databases/');            
             $.getJSON( url + 'databases/' + params,
@@ -329,15 +335,19 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
         }, //end of get_db_list:
 
 
-
+        /* Get list of collections from mongo server
+           params:
+               search (string, optional): text to search
+               method (string, optional): search method, either null (text search) or 're' (search will be interpreted as regular expression)
+        */
         get_collection_list: function(search, method){
             var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
             var params = '';
-            if (search != '') { params += 'search=' + search; };
-            if (method != '') { params += '&method=' + method; };
+            if (search != '') { params += 'search=' + encodeURIComponent(search); };
+            if (method != '') { params += '&method=' + encodeURIComponent(method); };
             if (params != '') { params  = '?' + params; };
             try{
-            $.getJSON( url + 'collections/'+ this.options['database']  +'/' + params,
+            $.getJSON( url + 'collections/'+ encodeURIComponent(this.options['database'])  +'/' + params,
                 function(data,search, method){
                     if ( 'error' in data ) { alert('error: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
@@ -348,14 +358,17 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             } catch(e) {alert(e);};
 
 
-        }, // end of get_Collection_list
+        }, // end of get_collection_list
 
+        /*
+            retrieve collection statistics for selected collection
+        */
         get_collection_stats: function(){
-            var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
             var params = '';
             if (params != '') { params  = '?' + params; };
             try{
-            $.getJSON( url + 'collection/' + this.options['database']  +'/' + this.options['collection'] + '/stats/' + params,
+            $.getJSON( url + 'collection/' + encodeURIComponent(this.options['database'])  +'/' + encodeURIComponent(this.options['collection']) + '/stats/' + params,
                 function(data){
                     if ( 'error' in data ) { alert('error: ' + data['error']); return; }
                     $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_stats_received', this, {'data' :  data['data'] } );
@@ -366,13 +379,21 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             } catch(e) {alert(e);};
 
 
-        }, // end of get_Collection_stats
+        }, // end of get_collection_stats
 
+
+        /*
+            get documents matching given criteria
+                params:
+                    query: JSON representing query
+                    limit: number of documents to retrieve
+                    skip: how many documents ommit from results
+                    sorting: sort order, in mongo format: array of arrays ["fieldname", "ordering"], for example: [["_id",1]]
+            returns JSON with results
+        */
         get_data: function(query, limit, skip, sorting, callback){ 
-            var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
             var params = '';
-            //params += 'query=' + JSON.stringify(query) + '&limit=' + limit + '&skip=' + skip;
-            //if (params != '') { params  = '?' + params; }; 
             query_data = {
                   q: JSON.stringify(query),
                   limit: limit,
@@ -389,7 +410,6 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
         }, //end of get_data
 
    signal: function(signal_name, signal_source, signal_data ) {
-        //alert('mongo ajax received signal' + signal_name);
         if (signal_name == 'database_selected')
         {
             this.options['database'] = signal_data['database'];
@@ -417,13 +437,16 @@ $.widget("ui.fom_object_mongo_ajax", Fom_mongo_ajax);
 $('#mongo_ui_header_tools_bus').fom_bus();
 $('#mongo_ui_container').append("<div id='mongo_ajax'></div>");
 $('#mongo_ajax').fom_object_mongo_ajax({'host':connection_params['host'], 'port': connection_params['port'], 'database' : null, 'collection' : null });
+
 //init console
 //$('#mongo_ui_container').append("<div id='mongo_console'></div>");
 //$('#mongo_console').fom_console();
+
 //initialize all plugins
 fom_init_plugins();
 //tell everybody we are starting the party
 $('#mongo_ui_header_tools_bus').fom_bus('signal', 'app_init', this, {} );
+
 //hide error msg
 $('#errormsg').hide();
 
