@@ -83,15 +83,15 @@ function render_json_value(value)
 
 function format_mongo_json_data(json_data_array)
 /*
-    Return nicely formatted mongo data
+    Return json represented in html
 */
 {
     var resp = '<div class="fom_ui_json_data">';
-    //return JSON.stringify(json_data_array, null, 4);
+    
     for(var i in json_data_array)
     {
         resp += '<div class="fom_ui_json_container">';
-        //resp += '<div class="fom_ui_json_toggle" onclick="$(this).next().next().toggle(); $(this).html($(this).next().next().is(\':visible\')?\'-\':\'+\');">+</div>';
+
         resp += '<div class="fom_ui_json_toggle">+</div>';
         if(!('_id' in json_data_array[i]))
             resp += '<div class="fom_ui_json_value_missing">value missing</div>';
