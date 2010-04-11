@@ -97,5 +97,5 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 #fom_dialog_db > div, #fom_dialog_coll > div  { font-size: 12pt; border: 4px; padding: 8px;}
 #fom_dialog_db > div :hover, #fom_dialog_coll > div :hover { background-color:orange; }
 
-#mongo_logo {position: absolute; left: 80%; top:10px; border-style: none;}
+#mongo_logo {position: absolute; left: 80%; top:90%; border-style: none;}
 #mongo_logo img {border-style: none;}
