@@ -25,9 +25,9 @@
       <js>
       <![CDATA[
       
-Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
+Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     _init: function(){ 
-        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        $.ui.fom_plugin.prototype._init.call(this); // call the original function 
         var this_obj = this;
         this.dialog_id = this.options['div_id'] + '_dialog';
         if (! ('show_data' in this.options)) this.options['show_data'] = false;
@@ -156,19 +156,14 @@ Fom_coll_info = $.extend({}, $.ui.fom_object.prototype, {
         
         
     },
-   //search: function(query){
-   //    $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
-   //},
-    destroy: function(){ 
-        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
-    }, 
+
 }); 
-$.widget("ui.fom_object_coll_info", Fom_coll_info); 
+$.widget("ui.fom_plugin_coll_info", Fom_coll_info); 
 
 
 //init collection list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_info"></span>');
-$('#mongo_ui_header_tools_coll_info').fom_object_coll_info({div_id:'mongo_ui_coll_info'});
+$('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_coll_info'});
 
 //end of collection info
 

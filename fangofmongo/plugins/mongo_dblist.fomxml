@@ -20,7 +20,7 @@
 Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
     _init: function(){ 
 
-        $.ui.fom_object.prototype._init.call(this); // call the original function 
+        $.ui.fom_plugin.prototype._init.call(this); // call the original function 
         var this_obj = this;
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this );
         $('#mongo_ui_container').append("<div id='mongo_ui_database_list'></div>");
@@ -47,16 +47,14 @@ Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
    search: function(query){
        $('#mongo_ajax').fom_object_mongo_ajax('get_db_list',query,'');
    },
-    destroy: function(){ 
-        $.ui.fom_object.prototype.destroy.call(this); // call the original function 
-    }, 
+
 }); 
 
-$.widget("ui.fom_object_db", Fom_db_list);
+$.widget("ui.fom_plugin_db", Fom_db_list);
 
 //init db list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_db"></span>');
-$('#mongo_ui_header_tools_db').fom_object_db();
+$('#mongo_ui_header_tools_db').fom_plugin_db();
 //end of database list
 
 
