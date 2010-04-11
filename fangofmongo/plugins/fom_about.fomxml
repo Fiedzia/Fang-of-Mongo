@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<plugins>
+<!-- About dialog  -->
+  <plugin>
+    <!-- Plugin info -->
+    <info>
+      <name>Fang of Mongo about dialog</name>
+      <author>Maciej Dziardziel (fiedzia@gmail.com)</author>
+      <description>Show Fang of Mongo about dialog</description>
+      <version>1.0</version>
+    </info>
+    <!-- Plugin code and resources -->
+    <resources>
+      <css>
+      <![CDATA[
+          <style type="text/css">
+              #mongo_ui_about_dialog {text-align:center;}
+              #mongo_ui_about_dialog li {text-align:left;}
+          </style>
+      ]]>
+      </css>
+      <js>
+      <![CDATA[
+      
+Fom_plugin_about = $.extend({}, $.ui.fom_plugin.prototype, {
+    _init: function(){ 
+        $.ui.fom_plugin.prototype._init.call(this); // call the original function 
+
+        var this_obj = this;
+        this.dialog_id = this.options['div_id'] + '_dialog';
+        
+
+        //dialog - about info
+        $('#' + this.options['div_id'] + '_dialog').dialog({
+            autoOpen: false,
+            height: 350,
+            width: 350,
+            modal: true,
+            closeOnEscape: true,
+            buttons: {
+                'Close': function() {$(this).dialog('close');},
+            },
+            title: 'Fang of Mongo - about',
+            //position : [220,100],
+
+        }); //end of dialog
+
+
+        //menu button
+        $('#mongo_ui_menu').append('<button id="mongo_ui_about_menu_btn">About</button>');
+        $('#mongo_ui_about_menu_btn').button();
+        var dialog_id = '#' + this.dialog_id;
+        $('#mongo_ui_about_menu_btn').click(
+            function () { 
+                $(dialog_id).dialog('isOpen')? $(dialog_id).dialog('close') : $(dialog_id).dialog('open');
+            }
+        );
+
+    }, 
+       
+
+}); 
+$.widget("ui.fom_plugin_about", Fom_plugin_about); 
+
+
+//init
+$('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_about"></span>');
+$('#mongo_ui_header_tools_about').fom_plugin_about({div_id:'mongo_ui_about'});
+
+//end of js for about dialog
+
+
+      ]]>
+      </js>
+      <html>
+      <![CDATA[   
+        <div id='mongo_ui_about'>
+           <div id='mongo_ui_about_dialog'>
+             <p>Fang of Mongo</p>
+             <p>Web based user interface for MongoDB</p>
+             <p>Written originaly by Maciej Dziardziel (<a href="mailto:fiedzia@gmail.com">fiedzia@gmail.com</a>)</p>
+             <p>Licensed under: <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU AGPL v3.0</a></p>
+             
+             <p>Project goals:</p>
+             <ul>
+              <li>allow users to easily explore mongdb content<br/> and any metainformation it may provide</li>
+              <li>Long term goal is to being able to perform<br/> any operation that can be done using mongodb console</li>
+             </ul>
+           </div>
+        </div>     
+
+      ]]>
+      </html>
+    </resources>
+  </plugin>
+
+</plugins>
+
