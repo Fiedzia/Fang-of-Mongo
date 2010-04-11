@@ -49,9 +49,9 @@ def list_databases(request, host, port):
         if request.GET:
             if 'search' in request.GET:
                 if request.GET.get('method','') =='re':
-                    dbnames = [dbname for dbname in dbnames if re.match(request.GET['search'], dbname)]
+                    dbnames = [dbname for dbname in dbnames if re.match(request.GET['search'], dbname, re.IGNORECASE)]
                 else:
-                    dbnames = [dbname for dbname in dbnames if request.GET['search'] in dbname]
+                    dbnames = [dbname for dbname in dbnames if request.GET['search'].lower() in dbname.lower()]
         dbnames.sort()
         json_response = json.dumps({'data':dbnames}, default=pymongo.json_util.default)
     except (Exception), e:
@@ -77,9 +77,9 @@ def list_collections(request, host, port, dbname):
         if request.GET:
             if 'search' in request.GET:
                 if request.GET.get('method','') =='re':
-                    collnames = [collname for collname in collnames if re.match(request.GET['search'], collname)]
+                    collnames = [collname for collname in collnames if re.match(request.GET['search'], collname, re.IGNORECASE)]
                 else:
-                    collnames = [collname for collname in collnames if request.GET['search'] in collname]
+                    collnames = [collname for collname in collnames if request.GET['search'].lower() in collname.lower()]
         collnames.sort()
         json_response = json.dumps({'data':collnames}, default=pymongo.json_util.default)
     except (Exception), e:
