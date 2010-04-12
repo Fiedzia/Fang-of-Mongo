@@ -51,7 +51,7 @@ function render_json_value(value)
         case("Number"):
         case("Boolean"):
         case("String"):
-            return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">' + escape_html(JSON.stringify(value)) + '</div>';
+            return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">' + escape_html(value) + '</div>';
         case("Array"):
         {
             resp = '<div class="fom_ui_json_value_array">';
