@@ -86,6 +86,7 @@ $('#mongo_ui_header_tools_about').fom_plugin_about({div_id:'mongo_ui_about'});
               <li>allow users to easily explore mongdb content<br/> and any metainformation it may provide</li>
               <li>Long term goal is to being able to perform<br/> any operation that can be done using mongodb console</li>
              </ul>
+             <p>Website: <a href="http://github.com/Fiedzia/Fang-of-Mongo">http://github.com/Fiedzia/Fang-of-Mongo</a></p>
            </div>
         </div>     
 
