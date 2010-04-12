@@ -386,26 +386,30 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             get documents matching given criteria
                 params:
                     query: JSON representing query
-                    limit: number of documents to retrieve
-                    skip: how many documents ommit from results
-                    sorting: sort order, in mongo format: array of arrays ["fieldname", "ordering"], for example: [["_id",1]]
+                    options: dictionary with:
+                        limit: number of documents to retrieve
+                        skip: how many documents ommit from results
+                        sorting: sort order, in mongo format: array of arrays ["fieldname", "ordering"], for example: [["_id",1]]
+                        callback: callback function
+                        context: context object
             returns JSON with results
         */
-        get_data: function(query, limit, skip, sorting, callback){ 
+        get_data: function(query, options){ 
             var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
             var params = '';
             query_data = {
                   q: JSON.stringify(query),
-                  limit: limit,
-                  skip: skip
+                  limit: options['limit'],
+                  skip: options['skip']
                 };
-            if (sorting)
-                query_data['sort'] = JSON.stringify(sorting);
+            if (options['sorting'])
+                query_data['sort'] = JSON.stringify(options['sorting']);
             $.ajax({
                 url: url + 'collection/' + this.options['database']  + '/' + this.options['collection'] + '/query/' + params,
                 dataType: 'json',
                 data: query_data,
-                success: callback
+                success: options['callback'],
+                context: ('context' in options) ? options['context'] : null,
             });
         }, //end of get_data
 
