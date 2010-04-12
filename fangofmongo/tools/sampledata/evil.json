@@ -1,0 +1,5 @@
+{ "_id":"script_alert_double_quotes", "name":"Script tag displaying alert (double quotes version)", "description":"Test proper escaping of html script tag", "data":"<script type=\"text/javascript\"> alert(\"script_alert test\"); </script>  ", "expected_result":""}
+{ "_id":"script_alert_single_quotes", "name":"Script tag displaying alert (single quotes version)", "description":"Test proper escaping of html script tag", "data":"<script type='text/javascript'> alert('script_alert test'); </script>  ", "expected_result":""}
+{ "_id":"four_backslashes", "name":"Four backslash characters", "description":"Test proper escaping of backslash character", "data":"\\\\\\\\", "expected_result":"You should see exactly four unescaped backslash characters"}
+{ "_id":"utf8", "name":"test unicode characters", "description":"Test proper displaying of unicode characters", "data":"ąśćółńżźĄŚĆÓŁŃŻŹ", "expected_result":"You should see exactly 16 characters, first 8 lowercase, last 8 uppercase"}
+
