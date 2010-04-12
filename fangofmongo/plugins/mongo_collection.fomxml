@@ -17,9 +17,17 @@
         #mongo_ui_coll_info_stats_indexes {white-space: pre-wrap;}
         #mongo_ui_coll_info_paginator, #mongo_ui_coll_info_paginator > *  { display: inline }
         #mongo_ui_coll_info_data_expand { display: block }
-        #mongo_ui_coll_info_data_limit {width: 50px}
-        #mongo_ui_coll_info_data_page  {width: 50px}
-        #mongo_ui_coll_info_data_sort  {width: 50px}
+        #mongo_ui_coll_info_data_limit {width: 30px}
+        #mongo_ui_coll_info_data_page  {width: 30px}
+        #mongo_ui_coll_info_data_sort  {width: 90px; display: none;}
+        #mongo_ui_coll_info_data_limit {display: inline;}
+        #mongo_ui_coll_info_data_page  {display: inline;}
+        
+        #mongo_ui_coll_info_data_expand,
+        #mongo_ui_coll_info_data_query,
+        #mongo_ui_coll_info_data_prev,
+        #mongo_ui_coll_info_data_next { width: 70px;}
+        
         </style>
       ]]>
       </css>
@@ -39,11 +47,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         this.options['limit'] = 10;
         this.options['page'] = 0;
         this.options['sort'] = null;
-        this.extra_sort_options = [];
 
         $("#mongo_ui_coll_info_stats_btn").button({});
         $("#mongo_ui_coll_info_data_btn").button();
-        $('#mongo_ui_coll_info_data_expand').button();
+        $('#mongo_ui_coll_info_data_expand').button({});
+        $('#mongo_ui_coll_info_data_query').button();
         $('#mongo_ui_coll_info_data_next').button();
         $('#mongo_ui_coll_info_data_prev').button();
         $('#mongo_ui_coll_info_data_next').click(function(){ this_obj.load_next(); });
@@ -77,6 +85,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         
         $('#mongo_ui_coll_info_data_sort_options').change( function(){
             $('#mongo_ui_coll_info_data_sort').val($(this).val());
+            $('#mongo_ui_coll_info_data_sort').trigger('change');
+            if ($(this).attr('selectedIndex') == 1)
+                $('#mongo_ui_coll_info_data_sort').show()
+            else
+                $('#mongo_ui_coll_info_data_sort').hide();
         });
         $('#mongo_ui_coll_info_data_sort').change(function() {
             try {
@@ -84,6 +97,17 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             } catch(e) {
                 alert('sort syntax error' + e); this_obj.options['sort'] = null; 
             };  
+        });
+        
+        
+        $('#mongo_ui_coll_info_stats_btn').click( function() {
+            $('#mongo_ui_coll_info_stats').toggle();
+            if($('#mongo_ui_coll_info_stats').is(':visible'))
+                $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+        });
+        
+        $('mongo_ui_coll_info_data_btn').click( function() {
+            $('#mongo_ui_coll_info_data').toggle();
         });
         
         $('#mongo_ui_coll_info_stats').hide();
@@ -237,7 +261,7 @@ $('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_col
         <div id='mongo_ui_coll_info'>
           <div id='mongo_ui_coll_info_dialog'>
           
-            <button type="button" id="mongo_ui_coll_info_stats_btn" onclick="$('#mongo_ui_coll_info_stats').toggle(); if($('#mongo_ui_coll_info_stats').is(':visible')) $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','',''); ">Stats</button>
+            <button type="button" id="mongo_ui_coll_info_stats_btn">Stats</button>
 
                 <div id='mongo_ui_coll_info_stats'>
                   Documents in collection: <span id='mongo_ui_coll_info_stats_count'></span><br/>
@@ -246,18 +270,53 @@ $('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_col
                 </div>
             <button type="button"  id="mongo_ui_coll_info_data_btn" onclick="$('#mongo_ui_coll_info_data').toggle();">Data</button>
                 <div id='mongo_ui_coll_info_data'>
-                        <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
+                        
                     <div id='mongo_ui_coll_info_paginator'>
-                        Per page: <input id="mongo_ui_coll_info_data_limit" type="text" value="10"/>
-                        Page: <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
-                        Sort: <select id="mongo_ui_coll_info_data_sort_options">
-                                  <option value=''>custom sort</option>
-                                  <option value='[["_id",1]]'>_id ASC</option>
-                                  <option value='[["_id",-1]]'>_id DESC</option>
-                              </select>
-                        <input id="mongo_ui_coll_info_data_sort" type="text" value=""/>
-                        <button id="mongo_ui_coll_info_data_prev">Prev</button>
-                        <button id="mongo_ui_coll_info_data_next">Next</button>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button id="mongo_ui_coll_info_data_prev">Prev</button>
+                                </td>
+                                <td>
+                                    <button id="mongo_ui_coll_info_data_next">Next</button>
+                                </td>
+                                <td>
+                                    Per page:
+                                </td>
+                                <td>
+                                    <input id="mongo_ui_coll_info_data_limit" type="text" value="10"/>
+                                </td>
+                                <td>
+                                    Sort:
+                                </td>
+                                <td>
+                                    <select id="mongo_ui_coll_info_data_sort_options">
+                                        <option value=''>unsorted</option>
+                                        <option value=''>custom sort</option>
+                                        <option value='[["_id",1]]'>_id ASC</option>
+                                        <option value='[["_id",-1]]'>_id DESC</option>
+                                   </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="mongo_ui_coll_info_data_query" /><label for="mongo_ui_coll_info_data_query">Query</label>
+                                </td>
+                                <td>
+                                    Page:
+                                </td>
+                                <td>
+                                    <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
+                                </td>
+                                <td colspan="2">
+                                    <input id="mongo_ui_coll_info_data_sort" type="text" value=""/>
+                                </td>
+                            </tr>
+                        </table>
+                        
                     </div>
 
                   <div id='mongo_ui_coll_info_data_container'></div>

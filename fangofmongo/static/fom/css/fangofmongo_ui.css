@@ -57,6 +57,9 @@ h1 { font-size: 1.2em; margin: .6em 0; }
     /*background-color: white;*/
 }
 
+.fom_ui_json_key {  font-weight: bold;}
+
+
 .fom_ui_json_value_missing { background-color: yellow; }
 .fom_ui_json_id {}
 .fom_ui_json_key {}
@@ -65,7 +68,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 .fom_ui_json_value_boolean {}
 
 .fom_ui_json_value_dict {
-    margin-left:10px;
+    margin-left:20px;
     /*background-color: white;*/
     border-style: solid;
     border-width: 1px;
@@ -75,7 +78,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 
 
 .fom_ui_json_value_document {
-    margin-left:10px;
+    margin-left:20px;
     /*background-color: white;*/
     border-style: solid;
     border-width: 1px;
@@ -85,7 +88,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
     -khtml-border-radius: 12px;    /* Konqueror */
     -moz-border-radius: 12px; /* Firefox */
     border-radius: 12px;
-    font-size: 12pt;
+    font-size: 10pt;
 }
 
 #mongo_ui_header { color: white; background-color: orange; font-size: 20pt; }

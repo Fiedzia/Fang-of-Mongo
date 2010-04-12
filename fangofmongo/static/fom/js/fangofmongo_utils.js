@@ -50,30 +50,34 @@ function render_json_value(value)
     {
         case("Number"):
         case("Boolean"):
+            return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">' + escape_html(value+"") + '</div>';
         case("String"):
-            return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">' + escape_html(value) + '</div>';
+            return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">"' + escape_html(value) + '"</div>';
         case("Array"):
         {
-            resp = '<div class="fom_ui_json_value_array">';
+            resp = '<div class="fom_ui_json_value_array">[';
             for(var i in value)
             {
                 resp += render_json_value(value[i]);
             }               
-            resp += '</div>';
+            resp += ']</div>';
             return resp; 
         }
         case("Object"):
         {
-            if ('$date' in value) return '<div class="fom_ui_json_value_date">' + $.datepicker.formatDate('yy-mm-dd',  new Date(value['$date'])) + '</div>';
-            else if ('$oid' in value) return '<div class="fom_ui_json_value_oid">ObjectId("' + value['$oid'] + '")</div>';
+            if ('$date' in value)
+                return '<div class="fom_ui_json_value_date">' + $.datepicker.formatDate('yy-mm-dd',  new Date(value['$date'])) + '</div>';
+                
+            if ('$oid' in value)
+                return '<div class="fom_ui_json_value_oid">ObjectId("' + value['$oid'] + '")</div>';
             
-            resp = '<div class="fom_ui_json_value_dict">';
+            resp = '<div class="fom_ui_json_value_dict">{<br/>';
             for(var key in value)
             {
-                resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' -&gt; ';
+                resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' : ';
                 resp += render_json_value(value[key]) + '<br/>';
             }
-            resp += '</div>';
+            resp += '}</div><br/>';
             return resp;
 
         }
@@ -101,7 +105,7 @@ function format_mongo_json_data(json_data_array)
         
         for(var key in json_data_array[i])
         {
-            resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' -&gt; ';
+            resp += '<div class="fom_ui_json_key">' + escape_html(JSON.stringify(key)) + '</div>' + ' : ';
             resp += render_json_value(json_data_array[i][key]);
             resp += '<br/>';
         }

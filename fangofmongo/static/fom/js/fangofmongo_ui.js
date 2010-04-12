@@ -402,8 +402,8 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                   limit: options['limit'],
                   skip: options['skip']
                 };
-            if (options['sorting'])
-                query_data['sort'] = JSON.stringify(options['sorting']);
+            if (options['sort'])
+                query_data['sort'] = JSON.stringify(options['sort']);
             $.ajax({
                 url: url + 'collection/' + this.options['database']  + '/' + this.options['collection'] + '/query/' + params,
                 dataType: 'json',
