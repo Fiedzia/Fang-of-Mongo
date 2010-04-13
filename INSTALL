@@ -12,18 +12,15 @@ older releases will require adding mongodb repository,
 see http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages 
 
 If you want some sample database content to play with, 
-Fom comes with freedb.org music album collection in json format/
-See fangofmongo/fangofmongo/tools/sampledata/freedb.json.
+Fom comes with freedb.org music album collection in json format suitable to use with mongoimport,
+located in fangofmongo/fangofmongo/tools/sampledata/freedb.json.
 
 I am using it on linux, but there is a chance that  any unix-like os will work as well.
 
 to install Fom, just unpack source somwhere,
-and in file fangofmongo/settings.py:
-    set FOM_PLUGIN_DIR and MEDIA_ROOT - both contain absolute paths
-    set TIMEZONE to your location
-
 go to fangofmongo directory and run:
-    ./manage.py runserver
+    python ./manage.py runserver
 
 now point your browser to http://localhost:8000/fangofmongo/
-If you have installed mongodb locally then just click proceed and enjoy it.
+If you have installed mongodb locally then just click proceed and enjoy it
+You may also set TIMEZONE in settings.py to make sure dates are processed correctly on django site

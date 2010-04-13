@@ -1,5 +1,5 @@
 # Django settings for fangofmongo project.
-
+import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -35,7 +35,8 @@ USE_I18N = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/fiedzia/moje/fangofmongo/fangofmongo/static/'
+ROOT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+MEDIA_ROOT = '%s/static/' % (ROOT_DIRECTORY,)
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -80,4 +81,4 @@ INSTALLED_APPS = (
     'fangofmongo.fom',
 )
 
-FOM_PLUGIN_DIR = '/home/fiedzia/moje/fangofmongo/fangofmongo/plugins/'
+FOM_PLUGIN_DIR = '%s/plugins/' % ROOT_DIRECTORY
