@@ -147,7 +147,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             var condition = $($(rows[1]).children('td')[i]).children('select').val();
             var value = $($(rows[2]).children('td')[i]).children('input').val();
 
-            if (field == "" || condition =="_ignore") continue;
+            if ((field == "" && condition != "$where") || condition =="_ignore") continue;
             switch(condition) {
                 case '$exists':
                     q = {}
@@ -207,8 +207,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                     $.extend(true, query, q);
                     break;
                 case '$where':
-                    q = {}
-                    q[field] = {$where: value};
+                    q = {$where: value};
                     $.extend(true, query, q);
                     break;
                     
