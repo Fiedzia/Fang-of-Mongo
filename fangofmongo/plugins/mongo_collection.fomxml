@@ -51,11 +51,14 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         $("#mongo_ui_coll_info_stats_btn").button({});
         $("#mongo_ui_coll_info_data_btn").button();
         $('#mongo_ui_coll_info_data_expand').button({});
-        $('#mongo_ui_coll_info_data_query').button();
+        $('#mongo_ui_coll_info_data_refresh').button({});
         $('#mongo_ui_coll_info_data_next').button();
         $('#mongo_ui_coll_info_data_prev').button();
         $('#mongo_ui_coll_info_data_next').click(function(){ this_obj.load_next(); });
         $('#mongo_ui_coll_info_data_prev').click(function(){ this_obj.load_prev(); });
+        $('#mongo_ui_coll_info_data_refresh').click(function(){
+            this_obj.load_data();        
+        });
         $('#mongo_ui_coll_info_data_expand').click(function(){
             if ($(this).is(':checked')) {
                 $(this).next().html('collapse');
@@ -110,12 +113,14 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             $('#mongo_ui_coll_info_data').toggle();
         });
         
+        $('#mongo_ui_coll_info_query_builder').fom_query_builder({div_id:'mongo_ui_coll_info_query_builder'});
+        
         $('#mongo_ui_coll_info_stats').hide();
         //dialog - collection info
         $('#' + this.options['div_id'] + '_dialog').dialog({
             autoOpen: true,
             height: 650,
-            width: 700,
+            width: 800,
             modal: false,
             closeOnEscape: false,
             buttons: {},
@@ -177,12 +182,16 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     {
         //if (!query) query = {};
         //if(!limit) limit = 10;
-        $('#mongo_ajax').fom_object_mongo_ajax('get_data', this.options['query'], {
-            limit: this.options['limit'],
-            skip: this.options['page'] * this.options['limit'],
-            sort: this.options['sort'],
-            callback: this.data_loaded,
-            context: this,
+        
+        $('#mongo_ajax').fom_object_mongo_ajax('get_data',
+            //this.options['query'],
+            $('#mongo_ui_coll_info_query_builder').fom_query_builder('build_query'),
+            {
+                limit: this.options['limit'],
+                skip: this.options['page'] * this.options['limit'],
+                sort: this.options['sort'],
+                callback: this.data_loaded,
+                context: this,
         });
     },
     load_next: function()
@@ -297,13 +306,15 @@ $('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_col
                                         <option value='[["_id",-1]]'>_id DESC</option>
                                    </select>
                                 </td>
+                                <td rowspan="2"><div id="mongo_ui_coll_info_query_builder"></div>
+                                </td>
                             </tr>
                             <tr>
                                 <td>
                                     <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
                                 </td>
                                 <td>
-                                    <input type="checkbox" id="mongo_ui_coll_info_data_query" /><label for="mongo_ui_coll_info_data_query">Query</label>
+                                    <button id="mongo_ui_coll_info_data_refresh" >Refresh</button>
                                 </td>
                                 <td>
                                     Page:
@@ -313,6 +324,8 @@ $('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_col
                                 </td>
                                 <td colspan="2">
                                     <input id="mongo_ui_coll_info_data_sort" type="text" value=""/>
+                                </td>
+                                <td>
                                 </td>
                             </tr>
                         </table>

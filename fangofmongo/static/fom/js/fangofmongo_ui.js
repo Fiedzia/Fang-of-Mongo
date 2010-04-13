@@ -39,7 +39,10 @@ $.widget("ui.fom_object", {
  });
 //end of fom_object
 
-
+/*
+* Plugin interface
+*
+*/
 Fom_plugin = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function
@@ -48,6 +51,176 @@ Fom_plugin = $.extend({}, $.ui.fom_object.prototype,{
 }); 
 $.widget("ui.fom_plugin", Fom_plugin); 
 
+
+/*
+* Query builder
+*/
+
+Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
+    _init: function(){ 
+        $.ui.fom_object.prototype._init.call(this); // call the original function
+        var this_obj = this;
+        this.div = $('#' + this.options['div_id']);
+        $(this.div).addClass('fom_query_builder');
+        $(this.div).append('<table>\
+                                <tr>\
+                                    <td>Field</td>\
+                                    <td><button class="fom_query_builder_btn_add">+</button></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>Condition</td>\
+                                    <td><button class="fom_query_builder_btn_del">-</button></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>Value</td>\
+                                    <td></td>\
+                                </tr>\
+                            </table>');
+        this.table = $(this.div).children()[0];
+        $(this.table).find('.fom_query_builder_btn_add').click( function() {
+            this_obj.add_query();
+        });
+        $(this.table).find('.fom_query_builder_btn_del').click( function() {
+            this_obj.del_query();
+        });
+        this.add_query();
+
+    },
+    
+    add_query: function() {
+        var rows = $(this.table).find('tr');
+        $(rows[0]).append('<td><input type="text" value="" class="fom_query_builder_field_name"></td>');
+        $(rows[1]).append('<td>\
+                               <select class="fom_query_builder_field_condition">\
+                                   <option value="_ignore">(ignore)</option>\
+                                   <option value="$exists">exists</option>\
+                                   <option value="$nexists">does not exists</option>\
+                                   <option value="$equals">equals</option>\
+                                   <option value="$ne">is not equal</option>\
+                                   <option value="$gt">greather</option>\
+                                   <option value="$gte">greather or equal</option>\
+                                   <option value="$lt">lower</option>\
+                                   <option value="$lte">lower or equal</option>\
+                                   <option value="$in">is any of</option>\
+                                   <option value="$nin">is not any of</option>\
+                                   <option value="$all">contains all of</option>\
+                                   <option value="$size">is of size</option>\
+                                   <option value="$type">is of type</option>\
+                                   <option value="$re">matches regular expression</option>\
+                                   <option value="$where">matches condition ($where)</option>\
+                               </select>\
+                           </td>');
+                               
+        $(rows[2]).append('<td><input type="text" class="fom_query_builder_field_value"/></td>');
+        
+        //alert( $(rows[0]).children('td').length);
+        this.build_query();
+
+    },
+    del_query: function() {
+        var rows = $(this.table).find('tr');
+        if ($(rows[0]).children('td').length > 3) {
+                $(rows[0]).children('td:last-child').remove();
+                $(rows[1]).children('td:last-child').remove();
+                $(rows[2]).children('td:last-child').remove();
+        }
+        
+        
+    },
+    
+    build_query: function() {
+    /*
+        function enhance_query(q, f, cond){
+            if (!(f in q)) {
+                q[f]  = cond;
+            } else {
+                //check conflicting queries
+            };
+            return q;
+        }*/
+        var rows = $(this.table).find('tr');
+
+        var query = {};
+        for(var i = 2; i< $(rows[0]).children('td').length; i++)
+        {
+            var field = $($(rows[0]).children('td')[i]).children('input').val();
+            var condition = $($(rows[1]).children('td')[i]).children('select').val();
+            var value = $($(rows[2]).children('td')[i]).children('input').val();
+
+            if (field == "" || condition =="_ignore") continue;
+            switch(condition) {
+                case '$exists':
+                    q = {}
+                    q[field]={$exists: true}
+                    $.extend(true, query, q);
+                    break;
+                case '$nexists':
+                    q = {}
+                    q[field]={$nexists: true}
+                    $.extend(true, query, q);
+                    break;
+                case '$equals':
+                    //query[field] = value;
+                    q = {}
+                    q[field]=value
+                    $.extend(true, query, q);
+                    break;
+                case '$ne':
+                    q = {}
+                    q[field] = {$ne:value};
+                    $.extend(true, query, q);
+                    break;
+                case '$gt' :
+                case '$gte':
+                case '$lt' :
+                case '$lte':
+                    q = {}
+                    q[field] = {};
+                    q[field][condition] = parseInt(value);
+                    $.extend(true, query, q);
+                    break;
+                case '$in':
+                case '$nin':
+                    q = {}
+                    q[field] = {};
+                    q[field][condition] = $.parseJSON(value);
+                    $.extend(true, query, q);
+                    break;
+                case '$all':
+                    q = {}
+                    q[field] = {$all: $.parseJSON(value)};
+                    $.extend(true, query, q);
+                    break;
+                case '$size':
+                    q = {}
+                    q[field] = {$size: parseInt(value)};
+                    $.extend(true, query, q);
+                    break;
+                case '$type':
+                    q = {}
+                    q[field] = {$type: parseInt(value)};
+                    $.extend(true, query, q);
+                    break;
+                case '$re':
+                    q = {}
+                    q[field] = {$regex:value};
+                    $.extend(true, query, q);
+                    break;
+                case '$where':
+                    q = {}
+                    q[field] = {$where: value};
+                    $.extend(true, query, q);
+                    break;
+                    
+            };
+            
+        };
+        //alert(JSON.stringify(query));
+        return query;
+    },
+
+}); 
+$.widget("ui.fom_query_builder", Fom_query_builder); 
 
 
 /**
