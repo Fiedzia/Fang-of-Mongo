@@ -216,7 +216,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
 
     clear_sort_options: function() {
         if ($('#mongo_ui_coll_info_data_sort_options')[0].options.length > 2) {
-            for( var i = $('#mongo_ui_coll_info_data_sort_options')[0].options.length -1; i >2; i--)
+            for( var i = $('#mongo_ui_coll_info_data_sort_options')[0].options.length -1; i > 3; i--)
             {
                 $($('#mongo_ui_coll_info_data_sort_options')[0].options[i]).remove();
             };
