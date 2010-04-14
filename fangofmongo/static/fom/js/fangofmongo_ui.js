@@ -621,8 +621,9 @@ $('#mongo_ajax').fom_object_mongo_ajax({'host':connection_params['host'], 'port'
 //initialize all plugins
 fom_init_plugins();
 //tell everybody we are starting the party
-$('#mongo_ui_header_tools_bus').fom_bus('signal', 'app_init', this, {} );
-
+$(window).load( function() {
+    $('#mongo_ui_header_tools_bus').fom_bus('signal', 'app_init', this, {} );
+});
 //hide error msg
 $('#errormsg').hide();
 
