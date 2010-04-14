@@ -262,7 +262,7 @@ $.widget("ui.fom_plugin_coll_info", Fom_coll_info);
 
 //init collection list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_info"></span>');
-$('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_coll_info'});
+$(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_coll_info'}); });
 
 //end of collection info
 

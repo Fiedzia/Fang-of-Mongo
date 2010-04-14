@@ -54,7 +54,7 @@ $.widget("ui.fom_plugin_db", Fom_db_list);
 
 //init db list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_db"></span>');
-$('#mongo_ui_header_tools_db').fom_plugin_db();
+$(window).load( function() { $('#mongo_ui_header_tools_db').fom_plugin_db(); });
 //end of database list
 
 

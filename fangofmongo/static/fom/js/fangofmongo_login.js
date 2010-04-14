@@ -51,9 +51,8 @@ function fom_init_login_form()
                 $('#errormsg').show();
             }
         });
-
      $('#errormsg').hide();
-     $('#start_dialog').dialog('open');
+     $(window).load( function() { $('#start_dialog').dialog('open');  });
 
     });
 } //end of init_fom

@@ -55,7 +55,7 @@ $.widget("ui.fom_plugin_colls", Fom_coll_list);
 
 //init collection list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_list"></span>');
-$('#mongo_ui_header_tools_coll_list').fom_plugin_colls();
+$(window).load( function() { $('#mongo_ui_header_tools_coll_list').fom_plugin_colls(); });
 
 //end of collection list
 
