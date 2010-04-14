@@ -114,8 +114,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         $('#mongo_ui_coll_info_tabs').bind("tabsshow", function() {
             if($('#mongo_ui_coll_info_tab_stats').is(':visible'))
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
-            else ($('#mongo_ui_coll_info_data').is(':visible'))
-                this.load_data();
+            else if ($('#mongo_ui_coll_info_data').is(':visible'))
+                this_obj.load_data();
 
         });
         
@@ -149,6 +149,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 $(dialog_id).dialog('isOpen')? $(dialog_id).dialog('close') : $(dialog_id).dialog('open');
             }
         );
+        $('#mongo_ui_coll_info_paginator table').find('td').css('vertical-align', 'top');
 
     }, 
         
@@ -175,7 +176,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             if($('#mongo_ui_coll_info_stats').is(':visible'))
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
             
-            else ($('#mongo_ui_coll_info_data').is(':visible'))
+            else if ($('#mongo_ui_coll_info_data').is(':visible'))
                 this.load_data();
         }
         else if ( signal_name == 'collection_stats_received')
