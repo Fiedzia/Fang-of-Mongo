@@ -27,6 +27,15 @@
         #mongo_ui_coll_info_data_prev,
         #mongo_ui_coll_info_data_next { width: 70px;}
 
+        
+        #mongo_ui_coll_info_tabs {position: absolute; width: 90%; height: 90%;  }
+        #mongo_ui_coll_info_tab_data {height: inherit;}
+        #mongo_ui_coll_info_tab_stats {height: inherit;}
+        #mongo_ui_coll_info_data {height: 70%;}
+        #mongo_ui_coll_info_stats {height: 70%;}
+
+        #mongo_ui_coll_info_paginator {height: auto;}
+        #mongo_ui_coll_info_data_container {height: 80%; overflow: auto;}
         </style>
       ]]>
       </css>
@@ -126,10 +135,6 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             buttons: {},
             title: 'Collection info',
             position : [220,100],
-            resizeStop : function(event, ui) {
-                $(this).children().width($(this).dialog('option','width')-30);
-                $(this).children().height($(this).dialog('option','height')-30);
-            },
 
         }); //end of dialog
 
