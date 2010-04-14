@@ -11,6 +11,8 @@ Expect all kinds of bugs and limitations. This is work in progress.
 For installation instruction, see INSTALL file
 To get the idea of code internals, see code_hacking.txt
 
+
+
 Project goals:
 
   - allow users to easily explore mongdb content
@@ -57,3 +59,5 @@ UI comments (thanks matt):
 
 
 author: Maciej Dziardziel (fiedzia@gmail.com)
+website:i http://github.com/Fiedzia/Fang-of-Mongo
+twitter: @fangofmongo
