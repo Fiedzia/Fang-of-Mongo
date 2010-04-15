@@ -23,12 +23,24 @@ def ui_page(request, host, port):
         mongo user interface
     """
     plugins = handle_plugins.load_plugins()
+    build_info = {}
     #for plugin in plugins:
     #    print 'plugin', plugin.name, plugin.js
+    
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        build_info = conn['admin'].command("buildinfo")
+    #except:
+    #    pass
+    finally:
+        conn.disconnect()
+
+
     return render_to_response('fom/templates/mongo_ui_page.html',
             {
               'connection_params' : { 'host' : host, 'port' : port, 'db' : None, 'coll' : None },
-              'plugins' : plugins 
+              'plugins' : plugins,
+              'build_info' : build_info,
             }
             )
 
@@ -88,6 +100,31 @@ def list_collections(request, host, port, dbname):
         conn.disconnect()
 
     return HttpResponse(json_response, mimetype='application/json')
+
+
+
+
+#@auth_required
+def db_stats(request, host, port, dbname):
+    """
+    From GET take:  login, password : database credentials(optional, currently ignored)
+
+    Return json with database stats,as returned by mongo (db.stats())
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        db = conn[dbname]
+        resp = db.command('dbstats')
+        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+    except (Exception), e:
+        json_response = json.dumps({'error': repr(e)})
+    finally:
+        conn.disconnect()
+        
+    return HttpResponse(json_response, mimetype='application/json')
+
+
+
 
 
 #@auth_required
