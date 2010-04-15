@@ -1,3 +1,0 @@
-
-class CmdException(Exception):
-    pass
