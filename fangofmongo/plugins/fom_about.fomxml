@@ -42,6 +42,11 @@ Fom_plugin_about = $.extend({}, $.ui.fom_plugin.prototype, {
             },
             title: 'Fang of Mongo - about',
             //position : [220,100],
+            close: function() {
+                //$('#mongo_ui_about_menu_btn').attr('checked',false);
+                $('#mongo_ui_about_menu_btn').button('refresh');
+            },
+            
 
         }); //end of dialog
 

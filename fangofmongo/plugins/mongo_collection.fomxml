@@ -135,6 +135,10 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             buttons: {},
             title: 'Collection info',
             position : [220,100],
+            close: function () {
+                $('#mongo_ui_coll_info_menu_btn').attr('checked',false);
+                $('#mongo_ui_coll_info_menu_btn').button('refresh');
+            },
 
         }); //end of dialog
 

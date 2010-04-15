@@ -27,6 +27,13 @@ Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
         $('#mongo_ui_database_list').fom_ui_list({'title':'Databases', 'div_id': 'mongo_ui_database_list', 'position':['left', 100]});
         $('#mongo_ui_database_list').bind('search', function(e, query){ this_obj.search(query); });
         $('#mongo_ui_database_list').bind('fom_item_selected', function(e, dbname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_selected', this, {'database': dbname } ); });
+        $('#mongo_ui_database_list').bind('close', function(){
+            $('#mongo_ui_database_list_menu_btn').attr('checked',false);
+            $('#mongo_ui_database_list_menu_btn').button('refresh');
+        });
+        $('#mongo_ui_database_list').fom_ui_list('get_ui_element', 'search_input').focus(function() {
+            $('#mongo_ui_header_tools_bus').fom_bus('signal', 'help_needed', this_obj, { book:'fom_db_list', topic:'search_db_list'  } );
+        });
         //menu button
         $('#mongo_ui_menu').append('<input type="checkbox" id="mongo_ui_database_list_menu_btn" checked="checked"/><label for="mongo_ui_database_list_menu_btn">Show dbs</label>');
         $('#mongo_ui_database_list_menu_btn').button();

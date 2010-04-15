@@ -414,6 +414,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
             title: this.options['title'],
             buttons: {},
             position : this.options['position'],
+            close: function() {$(my_id).trigger('close', []);},
 
 
      }); //end of dialog
@@ -439,6 +440,15 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; $(dn).addClass('fom_ui_list_item');  dn.innerHTML = escape_html(this);  $(id_name).append( dn ); });
         var my_id = '#' + this.options['div_id'];
         $('#' + this.item_list_id).children().click(function(){ $(id_name).children().each(function() {$(this).removeClass('fom_ui_list_item_selected');});  $(this).addClass('fom_ui_list_item_selected'); $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
+    },
+    
+    get_ui_element: function(element) {
+        switch(element) {
+            case 'search_input': return $('#' + this.input_id);
+            case 'search_btn': return $('#' + this.search_id);
+            case 'clear_btn': return  $('#' + this.clear_id);
+            default: return null;
+        };
     },
     
     destroy: function(){ 
