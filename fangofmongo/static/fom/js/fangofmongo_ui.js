@@ -563,6 +563,27 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
 
         }, // end of get_collection_stats
 
+        /*
+            retrieve collection indexes for selected collection
+        */
+        get_collection_indexes: function(){
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
+            var params = '';
+            if (params != '') { params  = '?' + params; };
+            try{
+            $.getJSON( url + 'collection/' + encodeURIComponent(this.options['database'])  +'/' + encodeURIComponent(this.options['collection']) + '/indexes/' + params,
+                function(data){
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                    $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_indexes_received', this, {'data' :  data['data'] } );
+                        
+                }
+            ); //end of $.getJSON
+                
+            } catch(e) {alert(e);};
+
+
+        }, // end of get_collection_stats
+
 
         /*
             get documents matching given criteria

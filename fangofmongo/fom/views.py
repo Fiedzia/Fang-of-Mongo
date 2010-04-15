@@ -124,6 +124,25 @@ def db_stats(request, host, port, dbname):
     return HttpResponse(json_response, mimetype='application/json')
 
 
+#@auth_required
+def coll_indexes(request, host, port, dbname, collname):
+    """
+    From GET take:  login, password : database credentials(optional, currently ignored)
+
+    Return information about collection indexes
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        db = conn[dbname]
+        coll = db[collname];
+        resp = coll.index_information()
+        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+    except (Exception), e:
+        json_response = json.dumps({'error': repr(e)})
+    finally:
+        conn.disconnect()
+        
+    return HttpResponse(json_response, mimetype='application/json')
 
 
 
@@ -137,11 +156,12 @@ def coll_stats(request, host, port, dbname, collname):
     try:
         conn = pymongo.Connection(host = host, port = int(port))
         db = conn[dbname]
-        coll = db[collname];
-        resp = {}
-        resp['count'] = coll.count();
-        resp['indexes'] = coll.index_information()
-        resp['options'] = coll.options()
+        resp = db.command({'collstats':collname})
+        #coll = db[collname];
+        #resp = {}
+        #resp['count'] = coll.count();
+        #resp['indexes'] = coll.index_information()
+        #resp['options'] = coll.options()
         json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})

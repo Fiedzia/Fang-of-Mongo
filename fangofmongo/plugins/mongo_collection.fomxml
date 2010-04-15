@@ -14,7 +14,8 @@
       <css>
       <![CDATA[
         <style type="text/css">
-        #mongo_ui_coll_info_stats_indexes {white-space: pre-wrap;}
+        #mongo_ui_coll_info_stats {white-space: pre-wrap;}
+        #mongo_ui_coll_info_indexes {white-space: pre-wrap;}
         #mongo_ui_coll_info_data_expand { display: block }
         #mongo_ui_coll_info_data_limit {width: 30px}
         #mongo_ui_coll_info_data_page  {width: 30px}
@@ -31,8 +32,10 @@
         #mongo_ui_coll_info_tabs {position: absolute; width: 96%; height: 96%;  }
         #mongo_ui_coll_info_tab_data {height: inherit;}
         #mongo_ui_coll_info_tab_stats {height: inherit;}
+        #mongo_ui_coll_info_tab_indexes {height: inherit;}
         #mongo_ui_coll_info_data {height: 98%;}
         #mongo_ui_coll_info_stats {height: 98%;}
+        #mongo_ui_coll_info_indexes {height: 98%;}
 
         #mongo_ui_coll_info_paginator {height: auto;}
         #mongo_ui_coll_info_data_container {height: 80%; overflow: auto;}
@@ -47,8 +50,6 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         $.ui.fom_plugin.prototype._init.call(this); // call the original function 
         var this_obj = this;
         this.dialog_id = this.options['div_id'] + '_dialog';
-        if (! ('show_data' in this.options)) this.options['show_data'] = false;
-        if (! ('show_stats' in this.options)) this.options['show_stats'] = false;
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         
         this.options['query'] = {};
@@ -114,6 +115,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         $('#mongo_ui_coll_info_tabs').bind("tabsshow", function() {
             if($('#mongo_ui_coll_info_tab_stats').is(':visible'))
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+            else if($('#mongo_ui_coll_info_tab_indexes').is(':visible'))
+                $('#mongo_ajax').fom_object_mongo_ajax('get_collection_indexes','','');
             else if ($('#mongo_ui_coll_info_data').is(':visible'))
                 this_obj.load_data();
 
@@ -162,10 +165,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         if (signal_name == 'database_selected')
         {
             $('#mongo_ui_coll_info_dialog').dialog('option', 'title', 'Collection info [no collection selected]');
-            $('#' + 'mongo_ui_coll_info_stats_count').html('');
-            $('#' + 'mongo_ui_coll_info_stats_indexes').html('');
-            $('#' + 'mongo_ui_coll_info_stats_options').html('');
-            $('#' + 'mongo_ui_coll_info_data_container').html('');
+            $('#' + 'mongo_ui_coll_info_stats').html('');
+            $('#' + 'mongo_ui_coll_info_indexes').html('');
         }        
         else if ( signal_name == 'collection_selected')
         {
@@ -179,15 +180,20 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             
             if($('#mongo_ui_coll_info_stats').is(':visible'))
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
+            else if($('#mongo_ui_coll_info_indexes').is(':visible'))
+                $('#mongo_ajax').fom_object_mongo_ajax('get_collection_indexes','','');
             
             else if ($('#mongo_ui_coll_info_data').is(':visible'))
                 this.load_data();
         }
         else if ( signal_name == 'collection_stats_received')
         {
-            $('#' + 'mongo_ui_coll_info_stats_count').html(signal_data['data']['count']);
-            $('#' + 'mongo_ui_coll_info_stats_indexes').html(JSON.stringify(signal_data['data']['indexes'], null, 4 ));
-            $('#' + 'mongo_ui_coll_info_stats_options').html(format_mongo_json_data(signal_data['data']['options'], null, 4));
+            $('#' + 'mongo_ui_coll_info_stats').html(JSON.stringify(signal_data['data'], null, '\n'));
+ 
+        }
+        else if ( signal_name == 'collection_indexes_received')
+        {
+            $('#' + 'mongo_ui_coll_info_indexes').html(JSON.stringify(signal_data['data'], null, '\n'));
  
         }
 
@@ -287,6 +293,7 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                 <ul>
                     <li><a href="#mongo_ui_coll_info_tab_data">Data</a></li>
                     <li><a href="#mongo_ui_coll_info_tab_stats">Stats</a></li>
+                    <li><a href="#mongo_ui_coll_info_tab_indexes">Indexes</a></li>
                 </ul>
                 <div id="mongo_ui_coll_info_tab_data">
                     <div id='mongo_ui_coll_info_data'>
@@ -348,9 +355,10 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                 </div>
                 <div id="mongo_ui_coll_info_tab_stats">
                     <div id='mongo_ui_coll_info_stats'>
-                        Documents in collection: <span id='mongo_ui_coll_info_stats_count'></span><br/>
-                        Indexes: <span id='mongo_ui_coll_info_stats_indexes'></span><br/>
-                        Options: <span id='mongo_ui_coll_info_stats_options'></span>
+                    </div>
+                </div>
+                <div id="mongo_ui_coll_info_tab_indexes">
+                    <div id='mongo_ui_coll_info_indexes'>
                     </div>
                 </div>
             </div>
