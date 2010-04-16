@@ -182,29 +182,29 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                 case '$lte':
                     q = {}
                     q[field] = {};
-                    q[field][condition] = parseInt(value);
+                    q[field][condition] = value;
                     $.extend(true, query, q);
                     break;
                 case '$in':
                 case '$nin':
                     q = {}
                     q[field] = {};
-                    q[field][condition] = $.parseJSON(value);
+                    q[field][condition] = value;
                     $.extend(true, query, q);
                     break;
                 case '$all':
                     q = {}
-                    q[field] = {$all: $.parseJSON(value)};
+                    q[field] = {$all: value};
                     $.extend(true, query, q);
                     break;
                 case '$size':
                     q = {}
-                    q[field] = {$size: parseInt(value)};
+                    q[field] = {$size: value};
                     $.extend(true, query, q);
                     break;
                 case '$type':
                     q = {}
-                    q[field] = {$type: parseInt(value)};
+                    q[field] = {$type: value};
                     $.extend(true, query, q);
                     break;
                 case '$re':
