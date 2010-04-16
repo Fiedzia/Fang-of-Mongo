@@ -1,3 +1,13 @@
+/*
+  Mongo convenctional helpers
+*/
+
+var ObjectId = function(s) {
+    return {$oid: s};
+};
+
+
+
 function escape_html(html_text)
 /*
     Escape html characters

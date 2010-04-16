@@ -146,6 +146,12 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             var field = $($(rows[0]).children('td')[i]).children('input').val();
             var condition = $($(rows[1]).children('td')[i]).children('select').val();
             var value = $($(rows[2]).children('td')[i]).children('input').val();
+            try {
+                value = eval('' + value);
+             } catch(e) {
+                 alert('query parsing error:' + e + ' for value:' + value )
+                 throw(e);
+             };
 
             if ((field == "" && condition != "$where") || condition =="_ignore") continue;
             switch(condition) {

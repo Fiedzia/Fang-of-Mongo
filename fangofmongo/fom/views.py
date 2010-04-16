@@ -187,7 +187,7 @@ def coll_query(request, host, port, dbname, collname):
         db = conn[dbname]
         coll = db[collname];
         resp = {}
-        query = json.loads(request.GET['q'])
+        query = json.loads(request.GET['q'], object_hook=json_util.object_hook)
         limit = 10
         sort = None
         if 'limit' in request.GET:
