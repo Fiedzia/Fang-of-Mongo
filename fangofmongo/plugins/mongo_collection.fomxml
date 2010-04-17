@@ -146,8 +146,9 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 $('#mongo_ui_coll_info_menu_btn').button('refresh');
             },
 
-        }); //end of dialog
 
+        }); //end of dialog
+        //$('#' + this.options['div_id'] + '_dialog').dialog('disable');
 
         //menu button
         $('#mongo_ui_menu').append('<input type="checkbox" id="mongo_ui_coll_info_menu_btn" checked="checked"/><label for="mongo_ui_coll_info_menu_btn">Collection info</label>');
@@ -160,6 +161,9 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             }
         );
         $('#mongo_ui_coll_info_paginator table').find('td').css('vertical-align', 'top');
+        if (this.options.disabled) {
+            this.disable();
+     };
 
     }, 
         
@@ -173,6 +177,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         }        
         else if ( signal_name == 'collection_selected')
         {
+            this.set_enabled(true);
             $('#' + 'mongo_ui_coll_info_stats').html('');
             $('#' + 'mongo_ui_coll_info_indexes').html('');
         
@@ -299,12 +304,6 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             };
         };
         
-        /*if ($('#mongo_ui_coll_info_data_sort_options')[0].options.length > 2) {
-            //for(var i = $('#mongo_ui_coll_info_data_sort_options')[0].options.length; i>2; i--) {
-            //        $($('#mongo_ui_coll_info_data_sort_options')[0].options[i]).remove();
-            //        alert(i);
-            //    }
-        };*/
     },
     
     data_loaded: function(data)
@@ -331,6 +330,28 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
 
         
     },
+    enable: function() {
+        this.set_enabled(true);
+    },
+    disable: function() {
+        this.set_enabled(false);
+    },
+    /*
+        Helper: single function for enabling/disabling 
+    */
+    set_enabled: function(enabled) {
+        if (enabled) {
+            method = 'enable';
+            $.ui.fom_plugin.prototype.enable.call(this); // call the original function 
+            $('#mongo_ui_coll_info_tabs').tabs().show();
+        } else {
+            method = 'disable';
+            $.ui.fom_plugin.prototype.disable.call(this); // call the original function 
+            $('#mongo_ui_coll_info_tabs').tabs().hide();
+        }
+        $('#' + this.dialog_id ).dialog(method);
+
+    },
     
 
 }); 
@@ -339,7 +360,7 @@ $.widget("ui.fom_plugin_coll_info", Fom_coll_info);
 
 //init collection list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_info"></span>');
-$(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_coll_info'}); });
+$(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_coll_info({div_id:'mongo_ui_coll_info', disabled: true}); });
 
 //end of collection info
 

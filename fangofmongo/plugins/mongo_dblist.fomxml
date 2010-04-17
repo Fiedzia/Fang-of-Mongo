@@ -19,12 +19,16 @@
 
 Fom_db_list = $.extend({}, $.ui.fom_object.prototype, {
     _init: function(){ 
-
         $.ui.fom_plugin.prototype._init.call(this); // call the original function 
         var this_obj = this;
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this );
         $('#mongo_ui_container').append("<div id='mongo_ui_database_list'></div>");
-        $('#mongo_ui_database_list').fom_ui_list({'title':'Databases', 'div_id': 'mongo_ui_database_list', 'position':['left', 100]});
+        $('#mongo_ui_database_list').fom_ui_list({
+            'title':'Databases',
+            'div_id': 'mongo_ui_database_list',
+            'position':['left', 100],
+            active: this.options.active,
+        });
         $('#mongo_ui_database_list').bind('search', function(e, query){ this_obj.search(query); });
         $('#mongo_ui_database_list').bind('fom_item_selected', function(e, dbname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_selected', this, {'database': dbname } ); });
         $('#mongo_ui_database_list').bind('close', function(){
@@ -61,7 +65,7 @@ $.widget("ui.fom_plugin_db", Fom_db_list);
 
 //init db list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_db"></span>');
-$(window).load( function() { $('#mongo_ui_header_tools_db').fom_plugin_db(); });
+$(window).load( function() { $('#mongo_ui_header_tools_db').fom_plugin_db({'active':true}); });
 //end of database list
 
 

@@ -22,7 +22,12 @@ Fom_coll_list = $.extend({}, $.ui.fom_plugin.prototype, {
         var this_obj = this;    
         $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
         $('#mongo_ui_container').append("<div id='mongo_ui_collection_list'></div>");
-        $('#mongo_ui_collection_list').fom_ui_list({'title':'Collections', 'div_id': 'mongo_ui_collection_list', 'position':['left', 420] });
+        $('#mongo_ui_collection_list').fom_ui_list({
+            'title':'Collections',
+            'div_id': 'mongo_ui_collection_list',
+            'position':['left', 420],
+            disabled: true,
+        });
         
         $('#mongo_ui_collection_list').bind('search', function(e, query){ this_obj.search(query); });
         $('#mongo_ui_collection_list').bind('fom_item_selected', function(e, collname){  $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_selected', this, {'collection': collname } ); });
@@ -48,6 +53,7 @@ Fom_coll_list = $.extend({}, $.ui.fom_plugin.prototype, {
         //alert('colls received signal' + signal_name);
         if (signal_name == 'database_selected')
         {
+            this.enable();
             $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list','','')
         }        
         if ( signal_name == 'collection_list_received')
@@ -55,7 +61,13 @@ Fom_coll_list = $.extend({}, $.ui.fom_plugin.prototype, {
             $('#mongo_ui_collection_list').fom_ui_list('set_list', signal_data['data'], signal_data['search'], signal_data['method']);
         }
 
-    },    
+    },
+    
+   enable: function() {
+       $.ui.fom_plugin.prototype.enable.call(this); // call the original function 
+       $('#mongo_ui_collection_list').fom_ui_list('enable');
+   },
+    
    search: function(query){
        $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
    },
@@ -65,7 +77,7 @@ $.widget("ui.fom_plugin_colls", Fom_coll_list);
 
 //init collection list
 $('#mongo_ui_header_tools').after('<span id="mongo_ui_header_tools_coll_list"></span>');
-$(window).load( function() { $('#mongo_ui_header_tools_coll_list').fom_plugin_colls(); });
+$(window).load( function() { $('#mongo_ui_header_tools_coll_list').fom_plugin_colls({disabled: true}); });
 
 //end of collection list
 

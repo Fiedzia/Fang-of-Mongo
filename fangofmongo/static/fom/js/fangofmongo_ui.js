@@ -8,16 +8,24 @@ function fom_init_mongo_ui()
 
 $(function() {
 
+
+/*
+  Base class for fom objects
+*/
 $.widget("ui.fom_object", {
    _init: function() {
      // init code for mywidget
+     var defaults = {
+         
+     };
+     this.options  = $.extend({}, defaults, this.options);
+     //alert('d:'+this.options.disabled);
      // can use this.options
-     this.active = false;
 
    },
+   //set_enabled(enabled) {}
    //value: function(a) { return a; },
    //length: function ( ) { return this.listeners.length;  },
-   active:  function ( ) { return this.active;  },
 
    signal: function(signal_name, signal_source, signal_data ) {
 
@@ -32,10 +40,9 @@ $.widget("ui.fom_object", {
 
  $.extend($.ui.fom_object, {
    getters: "value length",
-   defaults: {
-     active: false,
+   /*defaults: {
      //hidden: true
-   }
+   }*/
  });
 //end of fom_object
 
@@ -53,7 +60,7 @@ $.widget("ui.fom_plugin", Fom_plugin);
 
 
 /*
-* Query builder
+* Query builder elemen
 */
 
 Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
@@ -130,6 +137,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
     
     build_query: function() {
     /*
+    FIXME: detect if adding new query condition conflicts with existing ones
         function enhance_query(q, f, cond){
             if (!(f in q)) {
                 q[f]  = cond;
@@ -238,11 +246,9 @@ Fom_bus = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function 
         this.listeners = new Array();
-        this.active = true;
 
 }, 
     length: function ( ) { return this.listeners.length;  },
-    active:  function ( ) { return this.active;  },
 
     /* add listeners
        params:
@@ -272,7 +278,7 @@ $.widget("ui.fom_bus", Fom_bus);
 
 /**
 *
-*       Console ui object
+*       Console ui object - commented out, but I'LL BE BACK)
 *
 */
 /*
@@ -396,6 +402,7 @@ $.widget("ui.fom_console", Fom_console);
 Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
         $.ui.fom_object.prototype._init.call(this); // call the original function
+        
         this.options['title_prefix'] = this.options['title'];
         this.dialog_id = this.options['div_id'] + '_dialog';
         this.item_list_id = this.options['div_id'] + '_list';
@@ -437,7 +444,10 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
      $('#' + search_id).click(function() { $('#' + dialog_id).dialog('option','title', $('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) } );     
      $('#' + clear_id).click(function() { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')); $('#' + input_id).get(0).value = ''; $(my_id).trigger('search', ['']) } );     
      $('#' + input_id).keyup(function(event) { if (event.keyCode == 13) { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value ); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) }} );                
-     
+     if (this.options.disabled) {
+         //$('#' + dialog_id).dialog('disable');
+         this.disable();
+     };
 
     }, 
     set_list: function(item_list, search, method){
@@ -457,12 +467,36 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         };
     },
     
+    enable: function() {
+        this.set_enabled(true);
+    },
+    disable: function() {
+        this.set_enabled(false);
+    },
+
+    /*
+        Helper: single function for enabling/disabling 
+    */
+    set_enabled: function(enabled) {
+        if (enabled) {
+            $.ui.fom_object.prototype.enable.call(this); // call the original function 
+            method = 'enable';
+        } else {
+            method = 'disable';
+            $.ui.fom_object.prototype.disable.call(this); // call the original function 
+        }
+        $('#' + this.dialog_id ).dialog(method);
+        $('#' + this.search_id).button(method);
+        $('#' + this.clear_id).button(method);
+        $('#' + this.input_id).attr('disabled', !enabled);
+
+    },
+
     destroy: function(){ 
         $.ui.fom_object.prototype.destroy.call(this); // call the original function 
     }, 
 }); 
 $.widget("ui.fom_ui_list", Fom_item_list); 
-
 
 //end of item list ui object
 
