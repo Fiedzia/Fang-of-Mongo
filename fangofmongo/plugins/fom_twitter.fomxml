@@ -16,9 +16,9 @@
          #twitter_div{
              position: absolute;
              left: 1100px;
-             top:  200px;
+             top:  140px;
              width: 280px;
-             height: 300px;
+             height: 360px;
              font-size: 10pt;
              background-color: #eeeeee;
             -webkit-border-radius: 12px; /* Safari, Chrome */
