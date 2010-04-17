@@ -84,14 +84,14 @@ $('#mongo_ui_header_tools_about').fom_plugin_about({div_id:'mongo_ui_about'});
              <p>Fang of Mongo</p>
              <p>Web based user interface for MongoDB</p>
              <p>Written originaly by Maciej Dziardziel (<a href="mailto:fiedzia@gmail.com">fiedzia@gmail.com</a>)</p>
-             <p>Licensed under: <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU AGPL v3.0</a></p>
+             <p>Licensed under: <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html" target="_blank">GNU AGPL v3.0</a></p>
              
              <p>Project goals:</p>
              <ul>
               <li>allow users to easily explore mongdb content<br/> and any metainformation it may provide</li>
               <li>Long term goal is to being able to perform<br/> any operation that can be done using mongodb console</li>
              </ul>
-             <p>Website: <a href="http://github.com/Fiedzia/Fang-of-Mongo">http://github.com/Fiedzia/Fang-of-Mongo</a></p>
+             <p>Website: <a href="http://github.com/Fiedzia/Fang-of-Mongo" target="_blank">http://github.com/Fiedzia/Fang-of-Mongo</a></p>
            </div>
         </div>     
 
