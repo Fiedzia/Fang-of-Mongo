@@ -443,7 +443,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
     set_list: function(item_list, search, method){
         var id_name = '#' + this.item_list_id;
         $('#' + this.item_list_id).empty();
-        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; $(dn).addClass('fom_ui_list_item');  dn.innerHTML = escape_html(this);  $(id_name).append( dn ); });
+        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; $(dn).addClass('fom_ui_list_item');  dn.innerHTML = $('#fom_utils').fom_utils('escape_html', this);  $(id_name).append( dn ); });
         var my_id = '#' + this.options['div_id'];
         $('#' + this.item_list_id).children().click(function(){ $(id_name).children().each(function() {$(this).removeClass('fom_ui_list_item_selected');});  $(this).addClass('fom_ui_list_item_selected'); $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
     },
@@ -646,6 +646,8 @@ $.widget("ui.fom_object_mongo_ajax", Fom_mongo_ajax);
 *
 */
 
+//init utils
+$('#fom_utils').fom_utils();
 //init bus
 $('#mongo_ui_header_tools_bus').fom_bus();
 $('#mongo_ui_container').append("<div id='mongo_ajax'></div>");

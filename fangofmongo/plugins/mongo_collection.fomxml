@@ -170,6 +170,9 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         }        
         else if ( signal_name == 'collection_selected')
         {
+            $('#' + 'mongo_ui_coll_info_stats').html('');
+            $('#' + 'mongo_ui_coll_info_indexes').html('');
+        
             var db_name = $('#mongo_ajax').fom_object_mongo_ajax('option','database');
             $('#mongo_ui_coll_info_dialog').dialog(
                 'option','title','Collection info [' + db_name + ' -> ' + signal_data['collection'] + ']'
@@ -188,7 +191,14 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         }
         else if ( signal_name == 'collection_stats_received')
         {
-            $('#' + 'mongo_ui_coll_info_stats').html(JSON.stringify(signal_data['data'], null, '\n'));
+            data = signal_data['data'];
+            html = '<div>';
+            html += '<span class="">Document count:</span><span class="">' + data['count'] + '</span><br/>';
+            html += '<span class="">Total size:</span><span class="">' + data['storageSize'] + '</span><br/>';
+            html += '<span class="">Number of indexes:</span><span class="">' + data['nindexes'] + '</span><br/>';
+            html += '</div>';
+            html += '<div>' + JSON.stringify(signal_data['data'], null, '\n') + '</div>'
+            $('#' + 'mongo_ui_coll_info_stats').html(html);
  
         }
         else if ( signal_name == 'collection_indexes_received')
@@ -249,8 +259,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     data_loaded: function(data)
     {
         if ( 'error' in data ) { alert('error: ' + data['error']); return; }
-        $('#mongo_ui_coll_info_data_container').html(format_mongo_json_data(data['data']));
-        add_json_events($('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
+        $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
+        $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
         
         this.clear_sort_options();
         //iterate over data to find keys suitable to sorting
@@ -262,8 +272,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         };
         for (var key in sort_keys) {
             if (key == '_id') continue;
-            $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ escape_html(key) + '", 1]'+']' +"'"+'>' + escape_html(key) + ' ASC</option>');
-            $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ escape_html(key) + '",-1]'+']' +"'"+'>' + escape_html(key) + ' DESC</option>');
+            $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', key) + '", 1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', key) + ' ASC</option>');
+            $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', key) + '",-1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', key) + ' DESC</option>');
         };
         
 
