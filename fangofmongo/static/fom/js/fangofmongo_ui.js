@@ -88,7 +88,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             this_obj.add_query();
         });
         $(this.table).find('.fom_query_builder_btn_del').click( function() {
-            this_obj.del_query();
+            this_obj.clear_query();
         });
         this.add_query();
 
@@ -124,14 +124,20 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
         this.build_query();
 
     },
-    del_query: function() {
+    clear_query: function() {
         var rows = $(this.table).find('tr');
         if ($(rows[0]).children('td').length > 3) {
                 $(rows[0]).children('td:last-child').remove();
                 $(rows[1]).children('td:last-child').remove();
                 $(rows[2]).children('td:last-child').remove();
         }
+        $($(rows[0]).children('td')[2]).children('input').val('');
+        $($(rows[1]).children('td')[2]).children('select').val('');
+        $($(rows[2]).children('td')[2]).children('input').val('');
         
+//        $(rows[0]).children('td')[2]).children('input').val('');
+        //$(rows[1]).children('td')[2]).children('input').val('');
+        //$(rows[2]).children('td')[2]).children('input').val('');
         
     },
     

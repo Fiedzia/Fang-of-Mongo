@@ -226,7 +226,19 @@ $.widget("ui.fom_utils", {
         
         return $('<div class="fom_ui_json_toggle">' + state_char + '</div>');
     },
-   
+
+
+    /*
+        Traverse json structure and return list of keys/
+        used to suggest sort canidates
+        params:
+            data: mongo data
+            options:
+                not used currently 
+    */
+    fom_json_list_keys: function(json_data, options) {
+    },
+
     //value: function(a) { return a; },
     //length: function ( ) { return this.listeners.length;  },
     active:  function ( ) { return this.active;  },
