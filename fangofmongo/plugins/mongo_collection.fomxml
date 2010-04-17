@@ -196,10 +196,6 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         {
             data = signal_data['data'];
             
-            
-            
-            
-            
             $('#' + 'mongo_ui_coll_info_stats').html('');
             $('#' + 'mongo_ui_coll_info_stats')
                 .append(
@@ -208,6 +204,24 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                         .append('<span class="mongo_ui_coll_info_stats_name">Document count:</span><span class="mongo_ui_coll_info_stats_value">' + data['count'] + '</span><br/>')
                         .append('<span class="mongo_ui_coll_info_stats_name">Total size:</span><span class="mongo_ui_coll_info_stats_value">' + $('#fom_utils').fom_utils('format_filesize', data['storageSize']) + '</span><br/>')
                         .append('<span class="mongo_ui_coll_info_stats_name">Number of indexes:</span><span class="mongo_ui_coll_info_stats_value">' + data['nindexes'] + '</span><br/>')
+                        .append(                            //format size of each index
+                            (function(){
+                            var idx = $(null);
+                            for(k in data['indexSizes']) {
+                                idx=idx.add(
+                                    $('<span class="mongo_ui_coll_info_stats_name" />')
+                                        .css('margin-left','10px')
+                                        .html('index ' + k + ' :')
+                                    .add($('<span class="mongo_ui_coll_info_stats_value"></span>')
+                                        .html($('#fom_utils').fom_utils('format_filesize', data['indexSizes'][k]))
+                                        .add('<br/>')
+                                    )
+                                 )
+                             };
+                            
+                            return idx;
+                            })()
+                        )
                 ).append(
                     $('#fom_utils').fom_utils('fom_expandable',{state:'closed'}).click(function(){
                         $(this).next().next().toggle();
@@ -219,7 +233,6 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                     $('<div>' +JSON.stringify(signal_data['data'], null, '\n') + '</div>').hide()
                 );
             
-            //$('#fom_utils').fom_utils('expandable', fex[0]);
             
             
             
