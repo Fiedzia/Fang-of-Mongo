@@ -7,6 +7,30 @@ var ObjectId = function(s) {
 };
 
 /*
+ Fom jquery extensions
+*/
+
+/*
+ (function($) {
+ 
+   $.fn.fom_expandable = function(settings) {
+     //var config = {'foo': 'bar'};
+     //if (settings) $.extend(config, settings);
+     var obj = this;
+   fom_ui_json_toggle  
+     
+     this.each(function() {
+       // element-specific code here
+     });
+
+     return this;
+ 
+   };
+ 
+ })(jQuery);
+*/
+
+/*
   Collection of fom utilities
 */
 
@@ -19,6 +43,45 @@ $.widget("ui.fom_utils", {
     },
 
 
+
+    /*
+        Convert filesize into human readable units
+    */
+    format_filesize: function(fsize) 
+    {
+        if (fsize < 1024) {
+            return fsize + ' B';
+        } else if (fsize < 1024 * 1024) {
+            return (fsize/1024).toFixed(2) + ' KB';
+        } else if (fsize < 1024 * 1024 * 1024) {
+            return (fsize/(1024 * 1024)).toFixed(2) + ' MB';
+        } else if (fsize < 1024 * 1024 * 1024 *1024) {
+            return (fsize/(1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        } else if (fsize < 1024 * 1024 * 1024 * 1024 *1024) {
+            return (fsize/(1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TB';
+        } else {
+            return fsize + ' B';
+        };
+
+    },
+
+    
+/*
+    expandable: function( node, options ) {
+        alert(node);      
+        if(options) {
+          if ('tag' in options) tag = options['tag'];
+          else tag = 'div';
+          if ('hide' in options) hide = options['hide'];
+          else hide = false;
+        }
+        else {
+            tag = 'span';
+            hide = false;
+        };
+        
+    },
+*/
     /*
     * add event handlers to dom resulted from call to format_mongo_json_data
     * params:
@@ -133,6 +196,22 @@ $.widget("ui.fom_utils", {
     escape_html: function(html_text) 
     {
         return html_text.replace(/&/g,'&amp;').replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+    },
+
+
+    /*
+        Nice open/close button for marking opened/closed items in json view
+        params:
+            state: 'open' or 'closed'
+    */
+    fom_expandable: function(options){
+        if (options && 'state' in options) {
+            var state_char = options['state'] == 'open' ? '-' : '+';
+        } else {
+            var state_char = '-';
+        };
+        
+        return $('<div class="fom_ui_json_toggle">' + state_char + '</div>');
     },
    
     //value: function(a) { return a; },

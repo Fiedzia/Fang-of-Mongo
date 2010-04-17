@@ -39,6 +39,9 @@
 
         #mongo_ui_coll_info_paginator {height: auto;}
         #mongo_ui_coll_info_data_container {height: 80%; overflow: auto;}
+        
+        .mongo_ui_coll_info_stats_name { }
+        .mongo_ui_coll_info_stats_value { font-weight: bold; margin-left: 10px; }
         </style>
       ]]>
       </css>
@@ -192,13 +195,48 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         else if ( signal_name == 'collection_stats_received')
         {
             data = signal_data['data'];
+            
+            
+            
+            
+            
+            $('#' + 'mongo_ui_coll_info_stats').html('');
+            $('#' + 'mongo_ui_coll_info_stats')
+                .append(
+                    $('<div/>')
+                        .append('<div>Summary:</div>')
+                        .append('<span class="mongo_ui_coll_info_stats_name">Document count:</span><span class="mongo_ui_coll_info_stats_value">' + data['count'] + '</span><br/>')
+                        .append('<span class="mongo_ui_coll_info_stats_name">Total size:</span><span class="mongo_ui_coll_info_stats_value">' + $('#fom_utils').fom_utils('format_filesize', data['storageSize']) + '</span><br/>')
+                        .append('<span class="mongo_ui_coll_info_stats_name">Number of indexes:</span><span class="mongo_ui_coll_info_stats_value">' + data['nindexes'] + '</span><br/>')
+                ).append(
+                    $('#fom_utils').fom_utils('fom_expandable',{state:'closed'}).click(function(){
+                        $(this).next().next().toggle();
+                        $(this).html( $(this).next().next().is(':visible')? '-':'+');
+                    })
+                )
+                .append('<span>Show details</span>')
+                .append(
+                    $('<div>' +JSON.stringify(signal_data['data'], null, '\n') + '</div>').hide()
+                );
+            
+            //$('#fom_utils').fom_utils('expandable', fex[0]);
+            
+            
+            
+            /*
             html = '<div>';
-            html += '<span class="">Document count:</span><span class="">' + data['count'] + '</span><br/>';
-            html += '<span class="">Total size:</span><span class="">' + data['storageSize'] + '</span><br/>';
-            html += '<span class="">Number of indexes:</span><span class="">' + data['nindexes'] + '</span><br/>';
+            html += '<span class="mongo_ui_coll_info_stats_name">Document count:</span><span class="mongo_ui_coll_info_stats_value">' + data['count'] + '</span><br/>';
+            html += '<span class="mongo_ui_coll_info_stats_name">Total size:</span><span class="mongo_ui_coll_info_stats_value">' + $('#fom_utils').fom_utils('format_filesize', data['storageSize']) + '</span><br/>';
+            html += '<span class="mongo_ui_coll_info_stats_name">Number of indexes:</span><span class="mongo_ui_coll_info_stats_value">' + data['nindexes'] + '</span><br/>';
             html += '</div>';
             html += '<div>' + JSON.stringify(signal_data['data'], null, '\n') + '</div>'
-            $('#' + 'mongo_ui_coll_info_stats').html(html);
+            //$('#' + 'mongo_ui_coll_info_stats').html(
+            
+            $('#fom_utils').fom_utils( 'expandable', $(html))
+            
+            
+            //);
+            */
  
         }
         else if ( signal_name == 'collection_indexes_received')
