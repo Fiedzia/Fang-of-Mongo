@@ -690,6 +690,14 @@ $('#mongo_ajax').fom_object_mongo_ajax({'host':connection_params['host'], 'port'
 //$('#mongo_ui_container').append("<div id='mongo_console'></div>");
 //$('#mongo_console').fom_console();
 
+//set locale
+$.format.locale({
+                    number: {
+                        groupingSeparator: ' ',
+                        decimalSeparator: '.'
+                    }
+                });
+
 //initialize all plugins
 fom_init_plugins();
 //tell everybody we are starting the party

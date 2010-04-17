@@ -206,7 +206,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 .append(
                     $('<div/>')
                         .append('<div>Summary:</div>')
-                        .append('<span class="mongo_ui_coll_info_stats_name">Document count:</span><span class="mongo_ui_coll_info_stats_value">' + data['count'] + '</span><br/>')
+                        .append('<span class="mongo_ui_coll_info_stats_name">Document count:</span><span class="mongo_ui_coll_info_stats_value">' + $.format.number(data['count'], ',###') + '</span><br/>')
                         .append('<span class="mongo_ui_coll_info_stats_name">Total size:</span><span class="mongo_ui_coll_info_stats_value">' + $('#fom_utils').fom_utils('format_filesize', data['storageSize']) + '</span><br/>')
                         .append('<span class="mongo_ui_coll_info_stats_name">Number of indexes:</span><span class="mongo_ui_coll_info_stats_value">' + data['nindexes'] + '</span><br/>')
                         .append(                            //format size of each index
