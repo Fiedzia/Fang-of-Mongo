@@ -17,7 +17,7 @@
              position: absolute;
              left: 1100px;
              top:  200px;
-             width: 350px;
+             width: 280px;
              height: 300px;
              font-size: 10pt;
              background-color: #eeeeee;
@@ -25,6 +25,7 @@
             -khtml-border-radius: 12px;    /* Konqueror */
             -moz-border-radius: 12px; /* Firefox */
             border-radius: 12px;
+            border: 2px solid gray;
              
          }
          #twitter_div ul {
@@ -35,6 +36,12 @@
              background-color: #F6A828;
              color: white;
              font-weight: bold;
+             margin-top:5px;
+            -webkit-border-radius: 12px; /* Safari, Chrome */
+            -khtml-border-radius: 12px;    /* Konqueror */
+            -moz-border-radius: 12px; /* Firefox */
+            border-radius: 12px;
+
          }
          #twitter_div ul li {
              background-color: #CFCFCF;

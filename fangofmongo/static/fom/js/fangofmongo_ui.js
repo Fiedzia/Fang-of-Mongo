@@ -445,7 +445,6 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
      $('#' + clear_id).click(function() { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')); $('#' + input_id).get(0).value = ''; $(my_id).trigger('search', ['']) } );     
      $('#' + input_id).keyup(function(event) { if (event.keyCode == 13) { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value ); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) }} );                
      if (this.options.disabled) {
-         //$('#' + dialog_id).dialog('disable');
          this.disable();
      };
 

@@ -109,7 +109,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
     font-size: 10pt;
 }
 
-#mongo_ui_header { color: white; background-color: orange; font-size: 20pt; }
+#mongo_ui_header { color: white; background-color: orange; font-size: 20pt; font-weight: bold; }
 #mongo_ui_header_tools > div { display: inline; font-size: 10pt; color: white; background-color: darkorange; }
 #mongo_ui_header_tools > div :hover { color: red; font-size: 30pt; } 
 #mongo_ui_header_db_info { font-size: 10pt;}
