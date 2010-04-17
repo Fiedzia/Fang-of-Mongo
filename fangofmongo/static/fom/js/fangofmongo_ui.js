@@ -135,9 +135,6 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
         $($(rows[1]).children('td')[2]).children('select').val('');
         $($(rows[2]).children('td')[2]).children('input').val('');
         
-//        $(rows[0]).children('td')[2]).children('input').val('');
-        //$(rows[1]).children('td')[2]).children('input').val('');
-        //$(rows[2]).children('td')[2]).children('input').val('');
         
     },
     

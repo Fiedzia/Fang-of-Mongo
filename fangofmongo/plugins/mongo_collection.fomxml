@@ -59,6 +59,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         this.options['limit'] = 10;
         this.options['page'] = 0;
         this.options['sort'] = null;
+        this.options['clear_data_on_load'] = true; //clear sort/query options when receive data
 
         $('#mongo_ui_coll_info_tabs').tabs();
         $("#mongo_ui_coll_info_data_btn").button();
@@ -178,6 +179,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         else if ( signal_name == 'collection_selected')
         {
             this.set_enabled(true);
+            this.options['clear_data_on_load'] = true;
             $('#' + 'mongo_ui_coll_info_stats').html('');
             $('#' + 'mongo_ui_coll_info_indexes').html('');
         
@@ -190,13 +192,18 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             this.options['query'] = {};
             $('#mongo_ui_coll_info_query_builder').fom_query_builder('clear_query');
             
-            if($('#mongo_ui_coll_info_stats').is(':visible'))
+            if($('#mongo_ui_coll_info_stats').is(':visible')) {
+                $('#mongo_ui_coll_info_stats').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
-            else if($('#mongo_ui_coll_info_indexes').is(':visible'))
+            }
+            else if($('#mongo_ui_coll_info_indexes').is(':visible')) {
+                $('#mongo_ui_coll_info_indexes').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_indexes','','');
-            
-            else if ($('#mongo_ui_coll_info_data').is(':visible'))
+            }
+            else if ($('#mongo_ui_coll_info_data').is(':visible')) {
+                $('#mongo_ui_coll_info_data_container').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
                 this.load_data();
+                };
         }
         else if ( signal_name == 'collection_stats_received')
         {
@@ -285,6 +292,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     {
         $('#mongo_ui_coll_info_data_page').val( parseInt($('#mongo_ui_coll_info_data_page').val()) + 1 );
         this.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val()) -1 ;
+        this.options['clear_data_on_load'] = false;
+        $('#mongo_ui_coll_info_data_container').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
         this.load_data();
     },
     load_prev: function()
@@ -293,6 +302,8 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         {
             $('#mongo_ui_coll_info_data_page').val( parseInt($('#mongo_ui_coll_info_data_page').val()) - 1 );
             this.options['page'] = parseInt($('#mongo_ui_coll_info_data_page').val()) -1 ;
+            this.options['clear_data_on_load'] = false;
+            $('#mongo_ui_coll_info_data_container').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
             this.load_data();    
         }
     },
@@ -310,25 +321,23 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     data_loaded: function(data)
     {
         if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+        
+        //format and display received data
         $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
         $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
         
-        this.clear_sort_options();
-        //iterate over data to find keys suitable to sorting
-        sort_keys = {};
-        for(var i =0; i < data['data'].length; i++) {
-            for (var key in data['data'][i]) {
-                sort_keys[key] = true;
-            }
-        };
-        for (var key in sort_keys) {
-            if (key == '_id') continue;
-            $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', key) + '", 1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', key) + ' ASC</option>');
-            $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', key) + '",-1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', key) + ' DESC</option>');
-        };
+        //if (this.options['page'] == 0) {
+        if (this.options['clear_data_on_load'] == true) {
+            this.clear_sort_options();
+            var key_list = $('#fom_utils').fom_utils('fom_json_list_keys', data['data'] );
+            $.each(key_list, function(k,v) {
+                if (v != '_id') {
+                    $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', v) + '", 1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', v) + ' ASC</option>');
+                    $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', v) + '",-1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', v) + ' DESC</option>');
+                };
+            });
         
-
-
+        };
         
     },
     enable: function() {

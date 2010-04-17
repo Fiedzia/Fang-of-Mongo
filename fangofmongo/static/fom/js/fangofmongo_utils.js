@@ -232,11 +232,23 @@ $.widget("ui.fom_utils", {
         Traverse json structure and return list of keys/
         used to suggest sort canidates
         params:
-            data: mongo data
+            data: mongo data (array of documents)
             options:
                 not used currently 
     */
     fom_json_list_keys: function(json_data, options) {
+        var sort_keys = {};
+        for(var i =0; i < json_data.length; i++) {
+            $.each(json_data[i], function(k,v) {
+                sort_keys[k] = true;
+            });
+        };
+        var ret_sort_keys = [];
+        $.each(sort_keys, function(k,v) {
+            ret_sort_keys.push(k);
+        });
+            
+        return ret_sort_keys;
     },
 
     //value: function(a) { return a; },
