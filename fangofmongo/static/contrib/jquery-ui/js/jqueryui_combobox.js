@@ -7,6 +7,8 @@
           .insertAfter(select)
           .autocomplete({
             source: function(request, response) {
+            
+            /*
               var matcher = new RegExp(request.term, "i");
               response(select.children("option").map(function() {
                 var text = $(this).text();
@@ -17,6 +19,9 @@
                     value: text
                   };
               }));
+              
+              
+              */
             },
             delay: 0,
             select: function(e, ui) {

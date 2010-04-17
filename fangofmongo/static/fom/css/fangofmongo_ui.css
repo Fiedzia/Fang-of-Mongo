@@ -120,3 +120,9 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 
 #mongo_logo {position: absolute; left: 80%; top:90%; border-style: none;}
 #mongo_logo img {border-style: none;}
+
+
+/* jquery autocomplete widget*/
+    .ui-button-icon-only .ui-button-text { padding: 0.35em; } 
+    .ui-autocomplete-input { padding: 0.48em 0 0.47em 0.45em; }
+/**/

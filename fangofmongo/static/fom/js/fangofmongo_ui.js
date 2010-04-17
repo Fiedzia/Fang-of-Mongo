@@ -65,6 +65,12 @@ $.widget("ui.fom_plugin", Fom_plugin);
 
 Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
     _init: function(){ 
+        var defaults = {
+            autocomplete: true,
+            completion_source: [],
+        };
+        this.options  = $.extend({}, defaults, this.options);
+
         $.ui.fom_object.prototype._init.call(this); // call the original function
         var this_obj = this;
         this.div = $('#' + this.options['div_id']);
@@ -96,7 +102,8 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
     
     add_query: function() {
         var rows = $(this.table).find('tr');
-        $(rows[0]).append('<td><input type="text" value="" class="fom_query_builder_field_name"></td>');
+        //$(rows[0]).append('<td><input type="text" value="" class="fom_query_builder_field_name"></td>');
+        $(rows[0]).append($('<td />').html($('<input type="text" value="" class="fom_query_builder_field_name"/>').autocomplete({source:this.options.completion_source})) );
         $(rows[1]).append('<td>\
                                <select class="fom_query_builder_field_condition">\
                                    <option value="_ignore">(ignore)</option>\
@@ -159,6 +166,10 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             var value = $($(rows[2]).children('td')[i]).children('input').val();
             try {
                 value = eval('' + value);
+                //TODO: allow date objects in queries. THis hack might work (or make site completly broken as well...)
+                //value = eval('(function(){ _date=Date; Date=function(x) {return {$date: x} }; Date=_date;  return ' + value + '; })()');
+                alert(JSON.stringify(value))
+                alert(Date());
              } catch(e) {
                  alert('query parsing error:' + e + ' for value:' + value )
                  throw(e);
@@ -233,6 +244,14 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
         };
         //alert(JSON.stringify(query));
         return query;
+    },
+    
+    /*
+        pass array of values to field name autocomplete widget
+    */
+    completion_source: function(completions) {
+        this.options.completion_source = completions;
+        $(this.table).find('tr td input.fom_query_builder_field_name').autocomplete({source: completions});
     },
 
 }); 

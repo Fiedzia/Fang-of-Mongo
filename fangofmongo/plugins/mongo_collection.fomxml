@@ -326,16 +326,21 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
         $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
         
-        //if (this.options['page'] == 0) {
+
         if (this.options['clear_data_on_load'] == true) {
             this.clear_sort_options();
-            var key_list = $('#fom_utils').fom_utils('fom_json_list_keys', data['data'] );
-            $.each(key_list, function(k,v) {
+            var key_dict = $('#fom_utils').fom_utils('fom_json_list_keys', data['data'] );
+            var key_list = [];
+            
+            $.each(key_dict, function(k,v) {
+                key_list.push(v);
                 if (v != '_id') {
                     $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', v) + '", 1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', v) + ' ASC</option>');
                     $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', v) + '",-1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', v) + ' DESC</option>');
                 };
             });
+            key_list.sort();
+            $('#mongo_ui_coll_info_query_builder').fom_query_builder('completion_source', key_list);
         
         };
         
