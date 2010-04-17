@@ -168,8 +168,6 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                 value = eval('' + value);
                 //TODO: allow date objects in queries. THis hack might work (or make site completly broken as well...)
                 //value = eval('(function(){ _date=Date; Date=function(x) {return {$date: x} }; Date=_date;  return ' + value + '; })()');
-                alert(JSON.stringify(value))
-                alert(Date());
              } catch(e) {
                  alert('query parsing error:' + e + ' for value:' + value )
                  throw(e);
