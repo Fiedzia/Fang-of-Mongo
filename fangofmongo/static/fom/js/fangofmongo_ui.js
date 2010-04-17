@@ -182,7 +182,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                     break;
                 case '$nexists':
                     q = {}
-                    q[field]={$nexists: true}
+                    q[field]={$exists: false}
                     $.extend(true, query, q);
                     break;
                 case '$equals':
