@@ -82,6 +82,17 @@ $.widget("ui.fom_utils", {
         
     },
 */
+
+
+    /*
+        Format date
+    */
+    formatDate:function(date, format) {
+        //yyyy-mm-dd hh:mm:ss.miliseconds
+        return $.format.date(new Date(), format);
+    
+    },
+
     /*
     * add event handlers to dom resulted from call to format_mongo_json_data
     * params:
@@ -138,8 +149,10 @@ $.widget("ui.fom_utils", {
             }
             case("Object"):
             {
-                if ('$date' in value)
-                    return '<div class="fom_ui_json_value_date">' + $.datepicker.formatDate('yy-mm-dd',  new Date(value['$date'])) + '</div>';
+                if ('$date' in value) {
+                    var date = new Date(value['$date']);
+                    return '<div class="fom_ui_json_value_date">' + this.formatDate( date , "yyyy-MM-dd HH:mm:ss.SSS") + '</div>';
+                    }
                     
                 if ('$oid' in value)
                     return '<div class="fom_ui_json_value_oid">ObjectId("' + value['$oid'] + '")</div>';
