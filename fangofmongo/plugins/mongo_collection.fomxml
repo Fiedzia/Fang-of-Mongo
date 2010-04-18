@@ -70,6 +70,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         $('#mongo_ui_coll_info_data_next').click(function(){ this_obj.load_next(); });
         $('#mongo_ui_coll_info_data_prev').click(function(){ this_obj.load_prev(); });
         $('#mongo_ui_coll_info_data_refresh').click(function(){
+            this_obj.options['clear_data_on_load'] = false;
             this_obj.load_data();        
         });
         $('#mongo_ui_coll_info_data_expand').click(function(){
@@ -276,6 +277,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     {
         //if (!query) query = {};
         //if(!limit) limit = 10;
+        $('#mongo_ui_coll_info_data_container').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
         
         $('#mongo_ajax').fom_object_mongo_ajax('get_data',
             //this.options['query'],
@@ -323,8 +325,12 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         if ( 'error' in data ) { alert('error: ' + data['error']); return; }
         
         //format and display received data
-        $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
-        $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
+        if (data['data'].length == 0) {
+                $('#mongo_ui_coll_info_data_container').html('There are no records matchin query');
+        } else {
+            $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
+            $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
+        };
         
 
         if (this.options['clear_data_on_load'] == true) {
