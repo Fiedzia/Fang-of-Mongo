@@ -124,46 +124,70 @@ $.widget("ui.fom_utils", {
     */
     render_json_value: function (value)
     {
-
+        var this_obj = this;
         if (value == null)
         {
-            return '<div class="fom_ui_json_value_null>null</div>';
+            return $('<div />').addClass('fom_ui_json_value_null').html('null');
         }
 
         switch(value.constructor.name)
         {
             case("Number"):
             case("Boolean"):
-                return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">' + $('#fom_utils').fom_utils('escape_html', value+"") + '</div>';
+                return $('<div />').addClass('fom_ui_json_value_' + value.constructor.name.toLowerCase())
+                                   .html($('#fom_utils').fom_utils('escape_html', value+""));
             case("String"):
-                return '<div class="fom_ui_json_value_' + value.constructor.name.toLowerCase() + '">"' + $('#fom_utils').fom_utils('escape_html', value) + '"</div>';
+                return $('<div />').addClass('fom_ui_json_value_' + value.constructor.name.toLowerCase()).html($('#fom_utils').fom_utils('escape_html', value));
             case("Array"):
             {
-                resp = '<div class="fom_ui_json_value_array">[';
-                for(var i in value)
-                {
-                    resp += this.render_json_value(value[i]);
-                }               
-                resp += ']</div>';
+                resp = $('<div />').addClass('fom_ui_json_value_array').html(function(){
+                    var array_content = $('<span>[</span>');
+                    for(var i in value)
+                    {
+                        array_content = array_content.add(this_obj.render_json_value(value[i]));
+                    }               
+                    var array_content = array_content.add($('<span>]</span>'));
+                    return array_content;
+                
+                
+                });
+                //resp += ']</div>';
                 return resp; 
             }
             case("Object"):
             {
                 if ('$date' in value) {
                     var date = new Date(value['$date']);
-                    return '<div class="fom_ui_json_value_date">' + this.formatDate( date , "yyyy-MM-dd HH:mm:ss.SSS") + '</div>';
+                    return $('<div />').addClass('fom_ui_json_value_date').html(this.formatDate( date , "yyyy-MM-dd HH:mm:ss.SSS"));
                     }
                     
                 if ('$oid' in value)
-                    return '<div class="fom_ui_json_value_oid">ObjectId("' + value['$oid'] + '")</div>';
-                
-                resp = '<div class="fom_ui_json_value_dict">{<br/>';
-                for(var key in value)
-                {
-                    resp += '<div class="fom_ui_json_key">' + $('#fom_utils').fom_utils('escape_html', JSON.stringify(key)) + '</div>' + ' : ';
-                    resp += this.render_json_value(value[key]) + '<br/>';
-                }
-                resp += '}</div><br/>';
+                    return $('<div />').addClass('fom_ui_json_value_oid').html('ObjectId("' + value['$oid'] + '")');
+                    
+                resp = $('<div />').addClass('fom_ui_json_value_dict').html(function(){
+                    var object_wrapper = $('<span />').html('{').add('<br/>');
+                    var object_content = $(null);
+                    for (k in value)
+                    {
+                        v = value[k];
+                        object_content = object_content.add($('<div />')
+                            .addClass('fom_ui_json_key')
+                            .html(
+                                $('<span>' + $('#fom_utils').fom_utils('escape_html', JSON.stringify(k)) + '</span>')
+                          )
+                                .add($('<span/>').html(' : '))
+                                .add(this_obj.render_json_value(v))
+                                .add($('<br/>'))
+                          
+                      );
+                    };
+                    //object_content = object_content.add($('<span />').html('}').add('<br/>'));
+                    object_wrapper = object_wrapper.add($('<div class="fom_ui_json_value_dict_content"/>').html(object_content));
+                    object_wrapper = object_wrapper.add($('<span />').html('}').add('<br/>'));
+                    
+                    //object_wrapper = object_wrapper.add(object_content.wrap('<span class="fom_ui_json_value_dict_content"/>').parents());
+                    return object_wrapper;
+                });
                 return resp;
 
             }
@@ -172,34 +196,64 @@ $.widget("ui.fom_utils", {
     },
 
 
-    format_mongo_json_data: function (json_data_array)
+    format_mongo_json_data: function (json_data_array, options)
     /*
         Return json represented in html
     */
     {
-        var resp = '<div class="fom_ui_json_data">';
-        
-        for(var i in json_data_array)
-        {
-            resp += '<div class="fom_ui_json_container">';
 
-            resp += '<div class="fom_ui_json_toggle">+</div>';
-            if(!('_id' in json_data_array[i]))
-                resp += '<div class="fom_ui_json_value_missing">value missing</div>';
-            else
-                resp += '<div class="fom_ui_json_value_oid">' + (this.render_json_value(json_data_array[i]['_id'])) + '</div>';
-            resp += '<div class="fom_ui_json_value_document">';
-            
-            for(var key in json_data_array[i])
-            {
-                resp += '<div class="fom_ui_json_key">' + $('#fom_utils').fom_utils('escape_html', JSON.stringify(key)) + '</div>' + ' : ';
-                resp += this.render_json_value(json_data_array[i][key]);
-                resp += '<br/>';
-            }
-            resp += '</div>'; //document
-            resp += '</div>'; //container
-        }
-        resp += '</div>'; //fom_ui_json_data
+        if (!options) options = $.extend({}, options );
+        var this_obj = this;
+        
+        var resp = $('<div />').addClass('fom_ui_json_data').html( function () {
+
+            var documents = $(null);
+            $.each(json_data_array, function(array_index,document){
+                documents = documents.add($('<div />').addClass('fom_ui_json_container').html(function(){
+                    var doc = $('<div />').addClass('fom_ui_json_toggle').html('+');
+                    //special case for system.indexes
+                    if(!('_id' in document))
+                       doc = doc.add($('<div />')
+                           .addClass('fom_ui_json_value_missing')
+                           .html('value missing')
+                       );
+                    else
+                        doc = doc.add($('<div />')
+                             .addClass('fom_ui_json_value_oid')
+                             .html(this_obj.render_json_value(document['_id']))
+                         );
+                    
+                    doc = doc.add($('<div />').addClass('fom_ui_json_value_document')
+                    .dblclick(function(){
+                        var this_id = document['_id'];
+                        var this_obj = this;
+                        //alert($(this_obj).html());
+                        //$.ajax();
+                    })
+                    .html( function(){
+                    
+                        var doc2 = $(null);
+                        for (k in document) {
+                            v = document[k];
+                            doc2 = doc2.add(
+                                $('<div />').addClass('fom_ui_json_key').html(
+                                    $('#fom_utils').fom_utils('escape_html', JSON.stringify(k))
+                                )
+                            );
+                            doc2 = doc2.add($('<span />').html(' : '));
+                            doc2 = doc2.add(this_obj.render_json_value(v));
+                            doc2 = doc2.add($('<br/>'));
+                        };
+                        return doc2;
+                    
+                    }));
+                    return doc;
+                }))
+            })
+            return documents;
+        
+        });
+        
         return resp;
     },
 
