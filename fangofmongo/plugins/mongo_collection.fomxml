@@ -193,7 +193,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             this.options['query'] = {};
             $('#mongo_ui_coll_info_query_builder').fom_query_builder('clear_query');
             
-            if($('#mongo_ui_coll_info_stats').is(':visible')) {
+            if ($('#mongo_ui_coll_info_data').is(':visible')) {
+                $('#mongo_ui_coll_info_data_container').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
+                this.load_data();
+                }
+            else if($('#mongo_ui_coll_info_stats').is(':visible')) {
                 $('#mongo_ui_coll_info_stats').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_stats','','');
             }
@@ -201,10 +205,6 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 $('#mongo_ui_coll_info_indexes').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
                 $('#mongo_ajax').fom_object_mongo_ajax('get_collection_indexes','','');
             }
-            else if ($('#mongo_ui_coll_info_data').is(':visible')) {
-                $('#mongo_ui_coll_info_data_container').html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
-                this.load_data();
-                };
         }
         else if ( signal_name == 'collection_stats_received')
         {
