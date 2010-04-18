@@ -11,6 +11,23 @@ Expect all kinds of bugs and limitations. This is work in progress.
 For installation instruction, see INSTALL file
 To get the idea of code internals, see code_hacking.txt
 
+INSTALLATION:
+
+ * Ubuntu 10.04:
+   - requirements:
+       sudo aptitude install python-setuptools, mongodb, python-django
+       sudo easy_install pymongo
+
+  - installation:
+      grab archive using either:
+          - git: git clone http://github.com/Fiedzia/Fang-of-Mongo.git
+          - webbrowser: http://github.com/Fiedzia/Fang-of-Mongo/archives/fom_object
+            download archive and unpac into directory of your choice
+
+      after downloading, open console, cd to directory where the files are and type:
+          cd fangofmongo
+          python ./manage.py runserver
+          now point your browser to http://localhost:8000/fangofmongo/ and enjoy
 
 
 Project goals:
