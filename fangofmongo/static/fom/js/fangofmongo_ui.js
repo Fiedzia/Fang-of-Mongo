@@ -127,19 +127,19 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                                
         $(rows[2]).append('<td><input type="text" class="fom_query_builder_field_value"/></td>');
         
-        //alert( $(rows[0]).children('td').length);
         this.build_query();
 
     },
     clear_query: function() {
         var rows = $(this.table).find('tr');
+
         if ($(rows[0]).children('td').length > 3) {
                 $(rows[0]).children('td:last-child').remove();
                 $(rows[1]).children('td:last-child').remove();
                 $(rows[2]).children('td:last-child').remove();
         }
         $($(rows[0]).children('td')[2]).children('input').val('');
-        $($(rows[1]).children('td')[2]).children('select').val('');
+        $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
         $($(rows[2]).children('td')[2]).children('input').val('');
         
         
