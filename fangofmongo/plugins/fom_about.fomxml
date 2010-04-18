@@ -92,6 +92,7 @@ $('#mongo_ui_header_tools_about').fom_plugin_about({div_id:'mongo_ui_about'});
               <li>Long term goal is to being able to perform<br/> any operation that can be done using mongodb console</li>
              </ul>
              <p>Website: <a href="http://github.com/Fiedzia/Fang-of-Mongo" target="_blank">http://github.com/Fiedzia/Fang-of-Mongo</a></p>
+             <p>Many thanks to Ola, for patience and understanding and everything. </p>
            </div>
         </div>     
 
