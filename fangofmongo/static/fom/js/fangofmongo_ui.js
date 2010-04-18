@@ -165,9 +165,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             var condition = $($(rows[1]).children('td')[i]).children('select').val();
             var value = $($(rows[2]).children('td')[i]).children('input').val();
             try {
-                value = eval('' + value);
-                //TODO: allow date objects in queries. THis hack might work (or make site completly broken as well...)
-                //value = eval('(function(){ _date=Date; Date=function(x) {return {$date: x} }; Date=_date;  return ' + value + '; })()');
+                value = $('#fom_utils').fom_utils('json_to_strict', eval('' + value));
              } catch(e) {
                  alert('query parsing error:' + e + ' for value:' + value )
                  throw(e);

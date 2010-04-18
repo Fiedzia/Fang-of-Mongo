@@ -213,6 +213,44 @@ $.widget("ui.fom_utils", {
 
 
     /*
+        convert any object to strict json required by mongodb
+        Date instances are converted to {$date: 
+        for details see http://www.mongodb.org/display/DOCS/Mongo+Extended+JSON
+    */
+    json_to_strict: function(obj) {
+    
+        var traverse = function(obj) {
+            if (obj == null)
+                return null;
+            switch(obj.constructor.name) {
+                case("Number"):
+                case("Boolean"):
+                case("String"):
+                    return obj;
+                case("Array"):
+                    var arr = [];
+                    $.each(obj, function(item) {
+                        arr.push(traverse(item));
+                    });
+                    return arr;
+                case("Object"):
+                    newobj = {};
+                    $.each(obj, function(k, v) {
+                        newobj[traverse(k)] = traverse(v);
+                    });
+                    return newobj;
+                case("Date"):
+                    return {'$date' : obj.getTime()}
+                    
+            }; //end switch
+        
+        };
+        return traverse(obj);    
+
+},
+
+
+    /*
         Nice open/close button for marking opened/closed items in json view
         params:
             state: 'open' or 'closed'
