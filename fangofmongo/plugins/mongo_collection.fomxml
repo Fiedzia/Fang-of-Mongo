@@ -244,7 +244,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 )
                 .append('<span>Show details</span>')
                 .append(
-                    $('<div>' +JSON.stringify(signal_data['data'], null, '\n') + '</div>').hide()
+                    $('<div>' +JSON.stringify(signal_data['data'], null, '  ') + '</div>').hide()
                 );
             
             
@@ -268,7 +268,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         }
         else if ( signal_name == 'collection_indexes_received')
         {
-            $('#' + 'mongo_ui_coll_info_indexes').html(JSON.stringify(signal_data['data'], null, '\n'));
+            $('#' + 'mongo_ui_coll_info_indexes').html(JSON.stringify(signal_data['data'], null, '  '));
  
         }
 
