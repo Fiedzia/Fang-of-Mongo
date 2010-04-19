@@ -89,7 +89,7 @@ $.widget("ui.fom_utils", {
     */
     formatDate:function(date, format) {
         //yyyy-mm-dd hh:mm:ss.miliseconds
-        return $.format.date(new Date(), format);
+        return $.format.date(date, format);
     
     },
 
