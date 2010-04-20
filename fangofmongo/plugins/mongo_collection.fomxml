@@ -174,6 +174,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         if (signal_name == 'database_selected')
         {
             $('#mongo_ui_coll_info_dialog').dialog('option', 'title', 'Collection info [no collection selected]');
+            this.set_enabled(false);
             $('#' + 'mongo_ui_coll_info_stats').html('');
             $('#' + 'mongo_ui_coll_info_indexes').html('');
         }        
