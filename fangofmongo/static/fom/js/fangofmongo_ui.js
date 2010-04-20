@@ -580,7 +580,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                method (string, optional): search method, either null (text search) or 're' (search will be interpreted as regular expression)
         */
         get_collection_list: function(search, method){
-            var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
             var params = '';
             if (search != '') { params += 'search=' + encodeURIComponent(search); };
             if (method != '') { params += '&method=' + encodeURIComponent(method); };
@@ -598,6 +598,42 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
 
 
         }, // end of get_collection_list
+        
+        /*
+            save document
+            options:
+                document: json data in strict format
+                callback: function to call when we have response
+                context
+        */
+        save_document: function(options) {
+            var url = '/fangofmongo/rest/mongo/' + this.options['host'] + '/' + this.options['port'] + '/';
+            if (!("document" in options)) {
+                throw("save_document: Missing document");
+            }
+                
+            try {
+            
+                $.ajax({
+                  type: 'POST',
+                  url: url + 'collection/' + encodeURIComponent(this.options['database'])  +'/' + encodeURIComponent(this.options['collection']) + '/save_document/',
+                  data: {document: JSON.stringify(options["document"])},
+                  dataType: 'json',
+                  context: ('context' in options) ? options['context'] : null,
+                  success: function(data){
+                               if ( 'error' in data ) { alert('error: ' + data['error']);  };
+                               if ('callback' in options)
+                               options['callback'](data);
+                            
+                           },
+                  error: function(XMLHttpRequest, textStatus, errorThrown) {
+                      alert('save_document failed status' + textStatus + ' error:' + errorThrown);
+                  },
+                });   //end of $.ajax
+            } catch(e) {alert(e); throw(e);};
+                
+            
+        }, //end of save_document
 
         /*
             retrieve collection statistics for selected collection
@@ -615,7 +651,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                 }
             ); //end of $.getJSON
                 
-            } catch(e) {alert(e);};
+            } catch(e) {alert(e); throw(e);};
 
 
         }, // end of get_collection_stats
@@ -670,6 +706,10 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                 data: query_data,
                 success: options['callback'],
                 context: ('context' in options) ? options['context'] : null,
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert('get_data failed status' + textStatus + ' error:' + errorThrown);
+                },
+                
             });
         }, //end of get_data
 

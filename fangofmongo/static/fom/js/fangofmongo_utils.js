@@ -39,9 +39,23 @@ $.widget("ui.fom_utils", {
       // init code for mywidget
       // can use this.options
       this.active = false;
+      this.options['id_generator'] = 0; //used to generate id
 
     },
 
+    /*
+        generate unique ids
+            params:
+                prefix: optional prefix edded to id
+    */
+    generate_id: function(prefix) {
+        id = this.options['id_generator'];
+        this.options['id_generator']++;
+        if (prefix)
+            return prefix + '_' + id
+        else
+            return '' + id;
+    },
 
 
     /*
@@ -111,12 +125,12 @@ $.widget("ui.fom_utils", {
             $(node).children('.fom_ui_json_container').children('.fom_ui_json_toggle').html('+');
         };
         
-        $(node).children('.fom_ui_json_container').children('.fom_ui_json_toggle').click(function()
+        /*$(node).children('.fom_ui_json_container').children('.fom_ui_json_toggle').click(function()
             {
                 $(this).next().next().toggle();
                 $(this).html($(this).next().next().is(':visible')?'-':'+');
             }
-        );
+        );*/
     },
 
     /*
@@ -137,7 +151,7 @@ $.widget("ui.fom_utils", {
                 return $('<div />').addClass('fom_ui_json_value_' + value.constructor.name.toLowerCase())
                                    .html($('#fom_utils').fom_utils('escape_html', value+""));
             case("String"):
-                return $('<div />').addClass('fom_ui_json_value_' + value.constructor.name.toLowerCase()).html($('#fom_utils').fom_utils('escape_html', value));
+                return $('<div />').addClass('fom_ui_json_value_' + value.constructor.name.toLowerCase()).html('"'+ $('#fom_utils').fom_utils('escape_html', value)+'"');
             case("Array"):
             {
                 resp = $('<div />').addClass('fom_ui_json_value_array').html(function(){
@@ -196,10 +210,131 @@ $.widget("ui.fom_utils", {
     },
 
 
-    format_mongo_json_data: function (json_data_array, options)
     /*
-        Return json represented in html
+        Grab document from mongo by _id and render into given div
     */
+    get_end_render_document: function(document_id,element){
+        var this_obj = this;
+        element.html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
+        $('#mongo_ajax').fom_object_mongo_ajax('get_data',
+            {_id: this_obj.json_to_strict(document_id)},
+            {
+                callback: function(data){
+                    //FIXME: handle errors
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                    if (data['data'].length == 0) { alert('Cannot reload document. Query returned no data for given _id.'); };
+                    element.parent().html(this_obj.format_mongo_json_document(data['data'][0]));
+                },
+                context: element,
+        });          
+    },
+
+
+    /*
+        Return visual representation of single json document
+    */
+    format_mongo_json_document: function (document, options)
+    {
+        if (!options) options = $.extend({}, options );
+        var this_obj = this;
+
+        return $('<div />').addClass('fom_ui_json_container').html(function(){
+            var doc = $('<div />').addClass('fom_ui_json_toggle').html('+').click(function(){
+                $(this).next().next().toggle();
+                $(this).html($(this).next().next().is(':visible')?'-':'+');
+            });
+            //special case for system.indexes
+            if(!('_id' in document))
+                doc = doc.add($('<div />')
+                    .addClass('fom_ui_json_value_missing')
+                    .html('value missing')
+                );
+            else
+                doc = doc.add($('<div />')
+                      .addClass('fom_ui_json_value_oid')
+                      .html(this_obj.render_json_value(document['_id']))
+                  );
+            
+            doc = doc.add($('<div />').addClass('fom_ui_json_value_document')
+            .one('dblclick', function(){   //edit document
+                var document_id = document['_id'];
+                var div_obj = this;
+                $(this).html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
+                //FIXME:js is executed in evil.script_alert_single_quotes when editing
+                $('#mongo_ajax').fom_object_mongo_ajax('get_data',
+                    {_id: this_obj.json_to_strict(document_id)},
+                    {
+                        context: this,
+                        callback: function(data){
+                            var textarea_id = this_obj.generate_id('edit_');
+                            $(this).html($('<textarea />')
+                            .attr('id', textarea_id)
+                            .css('width','98%')
+                            .css('height','200px')
+                            .html(JSON.stringify(data["data"][0], null,' ')))
+                            .after($('<div />').html(
+                                $('<button>Save</button>').click(function(){
+                                    try {
+                                    var data = $('#' + textarea_id).val();
+                                    var data = eval(' _obj = ' + data);
+                                    //var data = JSON.parse(data); 
+                                    if (data == null || data.constructor.name != "Object")
+                                        throw("JSON parsing: invalid json");
+                                    $(this_obj).html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
+                                    $('#mongo_ajax').fom_object_mongo_ajax('save_document',
+                                        {
+                                        document: data,
+                                        callback: function(data){
+                                            /*alert('saved');*/
+                                            this_obj.get_end_render_document(data['_id'] ,$(div_obj));
+                                        },
+                                        context: this
+                                        }
+                                        
+                                    )
+                                    
+                                    
+                                    
+                                    } catch(e) {
+                                        alert('error:' + e); //FIXME:add general function for error handling and displaying
+                                        throw(e);
+                                    }
+                                    
+                                }).add($('<button>Discard</button>').click(function(){
+                                    this_obj.get_end_render_document(document['_id'] ,$(div_obj));
+                                }))
+                            ))
+                        },
+                });                                                 
+
+            })
+            .html( function(){
+            
+                var doc2 = $(null);
+                for (k in document) {
+                    v = document[k];
+                    doc2 = doc2.add(
+                        $('<div />').addClass('fom_ui_json_key').html(
+                            $('#fom_utils').fom_utils('escape_html', JSON.stringify(k))
+                        )
+                    );
+                    doc2 = doc2.add($('<span />').html(' : '));
+                    doc2 = doc2.add(this_obj.render_json_value(v));
+                    doc2 = doc2.add($('<br/>'));
+                };
+                return doc2;
+            
+            }));
+            return doc;
+        })
+
+    },
+
+
+    /*
+        Return visual representation of  array of json documents
+    */
+    format_mongo_json_data: function (json_data_array, options)
     {
 
         if (!options) options = $.extend({}, options );
@@ -209,46 +344,10 @@ $.widget("ui.fom_utils", {
 
             var documents = $(null);
             $.each(json_data_array, function(array_index,document){
-                documents = documents.add($('<div />').addClass('fom_ui_json_container').html(function(){
-                    var doc = $('<div />').addClass('fom_ui_json_toggle').html('+');
-                    //special case for system.indexes
-                    if(!('_id' in document))
-                       doc = doc.add($('<div />')
-                           .addClass('fom_ui_json_value_missing')
-                           .html('value missing')
-                       );
-                    else
-                        doc = doc.add($('<div />')
-                             .addClass('fom_ui_json_value_oid')
-                             .html(this_obj.render_json_value(document['_id']))
-                         );
-                    
-                    doc = doc.add($('<div />').addClass('fom_ui_json_value_document')
-                    .dblclick(function(){
-                        var this_id = document['_id'];
-                        var this_obj = this;
-                        //alert($(this_obj).html());
-                        //$.ajax();
-                    })
-                    .html( function(){
-                    
-                        var doc2 = $(null);
-                        for (k in document) {
-                            v = document[k];
-                            doc2 = doc2.add(
-                                $('<div />').addClass('fom_ui_json_key').html(
-                                    $('#fom_utils').fom_utils('escape_html', JSON.stringify(k))
-                                )
-                            );
-                            doc2 = doc2.add($('<span />').html(' : '));
-                            doc2 = doc2.add(this_obj.render_json_value(v));
-                            doc2 = doc2.add($('<br/>'));
-                        };
-                        return doc2;
-                    
-                    }));
-                    return doc;
-                }))
+                documents = documents.add(this_obj.format_mongo_json_document(document, options));
+                
+                
+
             })
             return documents;
         
@@ -268,11 +367,10 @@ $.widget("ui.fom_utils", {
 
     /*
         convert any object to strict json required by mongodb
-        Date instances are converted to {$date: 
+        for example: Date instances are converted to {$date: 
         for details see http://www.mongodb.org/display/DOCS/Mongo+Extended+JSON
     */
     json_to_strict: function(obj) {
-    
         var traverse = function(obj) {
             if (obj == null)
                 return null;
@@ -295,6 +393,8 @@ $.widget("ui.fom_utils", {
                     return newobj;
                 case("Date"):
                     return {'$date' : obj.getTime()}
+                //case("RegExp"):
+                //    return {'$regex' : obj.source, $options:}
                     
             }; //end switch
         
@@ -303,6 +403,47 @@ $.widget("ui.fom_utils", {
 
 },
 
+    /*
+        convert any object from strict required by mongodb to json
+        for example: Date instances are converted from {$date: ...} to Date() instances
+        for details see http://www.mongodb.org/display/DOCS/Mongo+Extended+JSON
+    strict_to_json: function(obj) {
+    
+        var traverse = function(obj) {
+            if (obj == null)
+                return null;
+            switch(obj.constructor.name) {
+                case("Number"):
+                case("Boolean"):
+                case("String"):
+                    return obj;
+                case("Array"):
+                    var arr = [];
+                    $.each(obj, function(item) {
+                        arr.push(traverse(item));
+                    });
+                    return arr;
+                case("Object"):
+                    if ('$date' in obj) return new Date(obj['$date']);
+                    if ('$oid' in obj) return new ObjectId(obj['$oid']);
+                    if ('$regex' in obj) return new ObjectId(obj['$oid']);
+                    newobj = {};
+                    $.each(obj, function(k, v) {
+                        newobj[traverse(k)] = traverse(v);
+                    });
+                    return newobj;
+                case("Date"):
+                    return {'$date' : obj.getTime()}
+                //case("RegExp"):
+                //    return {'$regex' : obj.source, $options:}
+                    
+            }; //end switch
+        
+        };
+        return traverse(obj);    
+
+},
+    */
 
     /*
         Nice open/close button for marking opened/closed items in json view
