@@ -142,7 +142,9 @@ def coll_indexes(request, host, port, dbname, collname):
     finally:
         conn.disconnect()
         
-    return HttpResponse(json_response, mimetype='application/json')
+    resp = HttpResponse(json_response, mimetype='application/json')
+    resp['Cache-Control'] = 'no-cache'
+    return resp
 
 
 
@@ -168,7 +170,9 @@ def coll_stats(request, host, port, dbname, collname):
     finally:
         conn.disconnect()
         
-    return HttpResponse(json_response, mimetype='application/json')
+    resp = HttpResponse(json_response, mimetype='application/json')
+    resp['Cache-Control'] = 'no-cache'
+    return resp
 
 #@auth_required
 def coll_query(request, host, port, dbname, collname):
@@ -207,7 +211,9 @@ def coll_query(request, host, port, dbname, collname):
     finally:
         conn.disconnect()
         
-    return HttpResponse(json_response, mimetype='application/json')
+    resp = HttpResponse(json_response, mimetype='application/json' )
+    resp['Cache-Control'] = 'no-cache'
+    return resp
 
 
 def save_document(request, host, port, dbname, collname):
