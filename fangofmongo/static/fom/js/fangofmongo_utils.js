@@ -179,6 +179,11 @@ $.widget("ui.fom_utils", {
                 if ('$oid' in value)
                     return $('<div />').addClass('fom_ui_json_value_oid').html('ObjectId("' + value['$oid'] + '")');
                     
+                if ('$regex' in value) {
+                    //var re_options = '';
+                    return $('<div />').addClass('fom_ui_json_value_regex').html($('#fom_utils').fom_utils('escape_html','/' + value['$regex'] + '/' + value['$options']));
+                    }
+                    
                 resp = $('<div />').addClass('fom_ui_json_value_dict').html(function(){
                     var object_wrapper = $('<span />').html('{').add('<br/>');
                     var object_content = $(null);
@@ -394,8 +399,13 @@ $.widget("ui.fom_utils", {
                     return newobj;
                 case("Date"):
                     return {'$date' : obj.getTime()}
-                //case("RegExp"):
-                //    return {'$regex' : obj.source, $options:}
+                case("RegExp"): {
+                        var re_options = '';
+                        if (obj.ignoreCase) re_options += 'i';
+                        if (obj.global) re_options += 'g';
+                        if (obj.multiline) re_options += 'm';
+                        return {'$regex' : obj.source, '$options': re_options}
+                    }
                     
             }; //end switch
         
