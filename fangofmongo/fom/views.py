@@ -209,6 +209,32 @@ def coll_query(request, host, port, dbname, collname):
         
     return HttpResponse(json_response, mimetype='application/json')
 
+
+def save_document(request, host, port, dbname, collname):
+    """
+    From POST take:  login, password : database credentials(optional, currently ignored)
+         document -  mongo document, JSON strict format
+
+    Return document _id or error
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        db = conn[dbname]
+        coll = db[collname];
+        resp = {}
+        document = json.loads(request.POST['document'], object_hook=json_util.object_hook)
+        _id =  coll.save(document)
+        json_response = json.dumps({'_id':_id}, default=pymongo.json_util.default)
+    except (Exception), e:
+        json_response = json.dumps({'error': repr(e)})
+    finally:
+        conn.disconnect()
+        
+    return HttpResponse(json_response, mimetype='application/json')
+
+
+
+
 #@auth_required
 def exec_cmd(request):
     """
