@@ -8,7 +8,6 @@ TODO list (varius bugs, tweaks and ideas)
   - properly discover list of sort candidates from json properly
   - introduce some menu interface, currently ordering is now unpredictable and plugins just mess with dom
   - document edition:
-    editing document evil.script_alert_single_quotes executes javascript. This is showstopper.
     after editing coloring of odd documents doesn't work
     allow removing of documents
     changing _id generates new document. Thats might require help information, some people might be surprised

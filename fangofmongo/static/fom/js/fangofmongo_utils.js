@@ -260,7 +260,6 @@ $.widget("ui.fom_utils", {
                 var document_id = document['_id'];
                 var div_obj = this;
                 $(this).html('<img src="/static/fom/img/ajax-loader.gif" style="border: 0;" />');
-                //FIXME:js is executed in evil.script_alert_single_quotes when editing
                 $('#mongo_ajax').fom_object_mongo_ajax('get_data',
                     {_id: this_obj.json_to_strict(document_id)},
                     {
@@ -268,10 +267,11 @@ $.widget("ui.fom_utils", {
                         callback: function(data){
                             var textarea_id = this_obj.generate_id('edit_');
                             $(this).html($('<textarea />')
-                            .attr('id', textarea_id)
-                            .css('width','98%')
-                            .css('height','200px')
-                            .html(JSON.stringify(data["data"][0], null,' ')))
+                                .attr('id', textarea_id)
+                                .css('width','98%')
+                                .css('height','200px')
+                                .html($('#fom_utils').fom_utils('escape_html',JSON.stringify(data["data"][0], null,' ')))
+                            )
                             .after($('<div />').html(
                                 $('<button>Save</button>').click(function(){
                                     try {
