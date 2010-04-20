@@ -99,6 +99,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
     border-radius: 12px;
 
 }
+.fom_ui_json_value_array, 
 .fom_ui_json_value_dict_content{
     margin-left:20px;
 }

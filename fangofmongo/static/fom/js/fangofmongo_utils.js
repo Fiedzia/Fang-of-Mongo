@@ -159,6 +159,7 @@ $.widget("ui.fom_utils", {
                     for(var i in value)
                     {
                         array_content = array_content.add(this_obj.render_json_value(value[i]));
+                        if (i < value.length-1) array_content = array_content.add($('<span>,</span>'))
                     }               
                     var array_content = array_content.add($('<span>]</span>'));
                     return array_content;
