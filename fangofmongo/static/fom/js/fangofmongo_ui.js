@@ -227,7 +227,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                     break;
                 case '$re':
                     q = {}
-                    q[field] = {$regex:value};
+                    q[field] = value;//{$regex:value};
                     $.extend(true, query, q);
                     break;
                 case '$where':
@@ -422,64 +422,114 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         $.ui.fom_object.prototype._init.call(this); // call the original function
         
         this.options['title_prefix'] = this.options['title'];
+        this.options['has_selected'] = false;
         this.dialog_id = this.options['div_id'] + '_dialog';
         this.item_list_id = this.options['div_id'] + '_list';
         this.input_id = this.options['div_id'] + '_input';
         this.search_id = this.options['div_id'] + '_search';
         this.clear_id = this.options['div_id'] + '_clear';
+        var this_obj = this;
         
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div class='fom_ui_note'></div><div class='fom_ui_list_items'><div id='" + this.item_list_id + "'></div></div></div>");
+        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><div><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div class='fom_ui_note'></div><div class='fom_ui_list_items'><div id='" + this.item_list_id + "'></div></div><div class='toolbox'></div></div></div>");
         var my_id = '#' + this.options['div_id'];
         var search_id = this.search_id;
         var clear_id = this.clear_id;
         var input_id = this.input_id;
-
+        this.toolbox = $('#'+this_obj.dialog_id).find('.toolbox').get(0);
+        $(this.toolbox).hide();
      
-     //dialog - item list
-     $('#' + this.options['div_id'] + '_dialog').dialog({
-            autoOpen: true,
-            height: 300,
-            width: 200,
-            modal: false,
-            closeOnEscape: false,
-            title: this.options['title'],
-            buttons: {},
-            position : this.options['position'],
-            close: function() {$(my_id).trigger('close', []);},
+        //dialog - item list
+        $('#' + this.options['div_id'] + '_dialog').dialog({
+                autoOpen: true,
+                height: 300,
+                width: 200,
+                modal: false,
+                closeOnEscape: false,
+                title: this.options['title'],
+                buttons: {},
+                position : this.options['position'],
+                close: function() {$(my_id).trigger('close', []);},
+
+        }); //end of dialog
+        
+        //show/hide toolbox (set of icons witl operations on selected element)
+        
+        $('#' + this.dialog_id).hover(function(event, ui) {
+            if(! this_obj.options['disabled'])
+                $(this_obj.toolbox).show();
+        });
+        
+        $('#' + this.dialog_id).mouseleave(function(event, ui) {
+            //if(! this_obj.options['disabled'])
+                $(this_obj.toolbox).hide();
+        });
 
 
-     }); //end of dialog
+        $('#' + this.dialog_id).dialog('open');
+        var dialog_id = this.dialog_id;
+        $('#' + this.options['tool_button_id']).click(function () {
+            $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');
+        });
+        $('#' + this.search_id).button();
+        $('#' + this.clear_id).button();
 
-     $('#' + this.dialog_id).dialog('open');
-     var dialog_id = this.dialog_id
-     $('#' + this.options['tool_button_id']).click(function () { $('#' + dialog_id).dialog('isOpen')? $('#' + dialog_id).dialog('close') : $('#' + dialog_id).dialog('open');});
-     $('#' + this.search_id).button();
-     $('#' + this.clear_id).button();
+        //set title properly when appending filter there
+        $('#' + dialog_id).dialog('option','title_prefix',this.options['title']);
 
-     //set title properly when appending filter there
-     $('#' + dialog_id).dialog('option','title_prefix',this.options['title']);
+        $('#' + search_id).click(function() {
+            $('#' + dialog_id).dialog('option','title', $('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value); $(my_id).trigger('search', [$('#' + input_id).get(0).value])
+        });     
+        $('#' + clear_id).click(function() {
+            $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix'));
+            $('#' + input_id).get(0).value = '';
+            $(my_id).trigger('search', [''])
+        });
+        
+        $('#' + input_id).keyup(function(event) {
+            if (event.keyCode == 13) {
+                $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value );
+                $(my_id).trigger('search', [$('#' + input_id).get(0).value])
+            }
+        })
+        
+        if (this.options.disabled) {
+            this.disable();
+        };
 
-     $('#' + search_id).click(function() { $('#' + dialog_id).dialog('option','title', $('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) } );     
-     $('#' + clear_id).click(function() { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')); $('#' + input_id).get(0).value = ''; $(my_id).trigger('search', ['']) } );     
-     $('#' + input_id).keyup(function(event) { if (event.keyCode == 13) { $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value ); $(my_id).trigger('search', [$('#' + input_id).get(0).value]) }} );                
-     if (this.options.disabled) {
-         this.disable();
-     };
-
-    }, 
+    }, //end of _init
+    
+    /*
+      Set list of items
+    */
     set_list: function(item_list, search, method){
         var id_name = '#' + this.item_list_id;
+        var this_obj = this;
+        this.options['has_selected'] = false;
         $('#' + this.item_list_id).empty();
-        $.each(item_list, function(){ var dn = document.createElement('div'); dn.fom_db = this; $(dn).addClass('fom_ui_list_item');  dn.innerHTML = $('#fom_utils').fom_utils('escape_html', this);  $(id_name).append( dn ); });
+        $.each(item_list, function(){
+            var dn = document.createElement('div');
+            dn.fom_db = this;
+            $(dn).addClass('fom_ui_list_item');
+            dn.innerHTML = $('#fom_utils').fom_utils('escape_html', this);
+            $(id_name).append( dn );
+        });
         var my_id = '#' + this.options['div_id'];
-        $('#' + this.item_list_id).children().click(function(){ $(id_name).children().each(function() {$(this).removeClass('fom_ui_list_item_selected');});  $(this).addClass('fom_ui_list_item_selected'); $(my_id).trigger('fom_item_selected', [this.fom_db]);}); 
-    },
+        $('#' + this.item_list_id).children().click(function(){
+            $(id_name).children().each(function() {
+                $(this).removeClass('fom_ui_list_item_selected');
+            });
+            $(this).addClass('fom_ui_list_item_selected');
+            this_obj.options['has_selected'] = true;
+            $(my_id).trigger('fom_item_selected', [this.fom_db]);
+        }); 
+    }, //end of set_list
     
     get_ui_element: function(element) {
         switch(element) {
             case 'search_input': return $('#' + this.input_id);
             case 'search_btn': return $('#' + this.search_id);
             case 'clear_btn': return  $('#' + this.clear_id);
+            case 'toolbox': return $(this.toolbox);
             default: return null;
         };
     },
@@ -487,8 +537,16 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
     enable: function() {
         this.set_enabled(true);
     },
+    
     disable: function() {
         this.set_enabled(false);
+    },
+    
+    /*
+        Check if database has selected items
+    */
+    has_selected: function(){
+        return this.options['has_selected'];
     },
 
     /*
