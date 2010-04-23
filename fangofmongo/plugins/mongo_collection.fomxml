@@ -177,7 +177,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             this.set_enabled(false);
             $('#' + 'mongo_ui_coll_info_stats').html('');
             $('#' + 'mongo_ui_coll_info_indexes').html('');
-        }        
+        }
+        else if (signal_name == 'no_database_selected')
+        {
+            this.disable();
+        }
         else if ( signal_name == 'collection_selected')
         {
             this.set_enabled(true);

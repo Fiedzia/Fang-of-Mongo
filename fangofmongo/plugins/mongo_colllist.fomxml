@@ -37,6 +37,7 @@ Fom_coll_list = $.extend({}, $.ui.fom_plugin.prototype, {
         $('#mongo_ui_collection_list_menu_btn').button();
         
         var dialog_id = '#' + $('#mongo_ui_collection_list').fom_ui_list('option','div_id')+'_dialog';
+
         $('#mongo_ui_collection_list_menu_btn').click(function () { $(dialog_id).dialog('isOpen')? $(dialog_id).dialog('close') : $(dialog_id).dialog('open');});
         $('#mongo_ui_collection_list').fom_ui_list('get_ui_element', 'search_input').focus(function() {
             $('#mongo_ui_header_tools_bus').fom_bus('signal', 'help_needed', this_obj, { book:'fom_collection_list', topic:'search_collection_list'  } );
@@ -55,7 +56,11 @@ Fom_coll_list = $.extend({}, $.ui.fom_plugin.prototype, {
         {
             this.enable();
             $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list','','')
-        }        
+        } else
+        if (signal_name == 'no_database_selected')
+        {
+            this.disable();
+        } else
         if ( signal_name == 'collection_list_received')
         {
             $('#mongo_ui_collection_list').fom_ui_list('set_list', signal_data['data'], signal_data['search'], signal_data['method']);
@@ -67,7 +72,13 @@ Fom_coll_list = $.extend({}, $.ui.fom_plugin.prototype, {
        $.ui.fom_plugin.prototype.enable.call(this); // call the original function 
        $('#mongo_ui_collection_list').fom_ui_list('enable');
    },
-    
+
+   disable: function() {
+       $.ui.fom_plugin.prototype.enable.call(this); // call the original function 
+       $('#mongo_ui_collection_list').fom_ui_list('disable');
+   },
+
+
    search: function(query){
        $('#mongo_ajax').fom_object_mongo_ajax('get_collection_list',query,'');
    },
