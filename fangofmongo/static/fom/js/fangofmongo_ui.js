@@ -430,7 +430,30 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         this.clear_id = this.options['div_id'] + '_clear';
         var this_obj = this;
         
-        $('#' + this.options['div_id']).append("<div id='" + this.dialog_id + "'><div><input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/><button id='" + this.search_id + "'>Search</button><button id='" + this.clear_id + "'>Clear</button><div class='fom_ui_note'></div><div class='fom_ui_list_items'><div id='" + this.item_list_id + "'></div></div><div class='toolbox'></div></div></div>");
+        $('#' + this.options['div_id']).append("\
+        <div id='" + this.dialog_id + "'>\
+          <div style='width: 99%; height: 99%; display: table;'>\
+            <div style='display: table-row; height: auto;'>\
+              <div style=' height: auto; display: table-cell;'>\
+                <input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/>\
+                <button id='" + this.search_id + "'>Search</button>\
+                <button id='" + this.clear_id + "'>Clear</button>\
+              </div>\
+            </div>\
+            <div style='display: table-row;  height: auto;'>\
+              <div style=' display: table-cell; height: 99%; '>\
+                <div class='fom_ui_note'></div>\
+                <div class='fom_ui_list_items'>\
+                  <div style='width: 99%;' id='" + this.item_list_id + "'></div>\
+                </div>\
+              </div>\
+            </div>\
+            <div style='display: table-row; height: auto;'>\
+              <div class='toolbox' style='height: auto; display: table-cell;'></div>\
+            </div>\
+          </div>\
+        </div>");
+        
         var my_id = '#' + this.options['div_id'];
         var search_id = this.search_id;
         var clear_id = this.clear_id;
@@ -477,7 +500,13 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         $('#' + dialog_id).dialog('option','title_prefix',this.options['title']);
 
         $('#' + search_id).click(function() {
-            $('#' + dialog_id).dialog('option','title', $('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value); $(my_id).trigger('search', [$('#' + input_id).get(0).value])
+            search_term = $('#' + input_id).get(0).value.trim();
+            if (search_term != '')
+              dialog_title = $('#' + dialog_id).dialog('option','title_prefix')+' ~' + search_term;
+            else
+              dialog_title = $('#' + dialog_id).dialog('option','title_prefix');
+            
+            $('#' + dialog_id).dialog('option','title', dialog_title); $(my_id).trigger('search', [$('#' + input_id).get(0).value])
         });     
         $('#' + clear_id).click(function() {
             $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix'));
@@ -487,8 +516,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         
         $('#' + input_id).keyup(function(event) {
             if (event.keyCode == 13) {
-                $('#' + dialog_id).dialog('option','title',$('#' + dialog_id).dialog('option','title_prefix')+' ~' + $('#' + input_id).get(0).value );
-                $(my_id).trigger('search', [$('#' + input_id).get(0).value])
+                $('#' + search_id).click();
             }
         })
         
