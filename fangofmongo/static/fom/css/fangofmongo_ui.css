@@ -6,6 +6,10 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 .ui-button { outline: 0; margin:0; padding: .4em 1em .5em; text-decoration:none;  !important; cursor:pointer; position: relative; text-align: center; }
 .ui-dialog .ui-state-highlight, .ui-dialog .ui-state-error { padding: .3em;  }
 
+/* oveeride theme button aligment in dialogs, fixes broken ordering of ok/cancel buttons in dialogs */
+.ui-dialog-buttonpane {text-align: right !important}
+.ui-dialog .ui-dialog-buttonpane button{ float: none !important}
+
 
 .fom_ui_list_item {
     text-align:center; padding: 5px;
@@ -28,7 +32,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
     
 }
 
-.fom_ui_list_items {width: 100%; height: 70%;  overflow: auto;}
+.fom_ui_list_items {width: 99%; height: 99%;  overflow: auto;}
 .fom_ui_list_item:hover { background-color: #89CFF0; } /* babyblue */
 .fom_ui_list_item_selected { background-color:orange;}
 
