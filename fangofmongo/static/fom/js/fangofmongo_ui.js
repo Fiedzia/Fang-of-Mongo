@@ -138,6 +138,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                 $(rows[1]).children('td:last-child').remove();
                 $(rows[2]).children('td:last-child').remove();
         }
+        
         $($(rows[0]).children('td')[2]).children('input').val('');
         $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
         $($(rows[2]).children('td')[2]).children('input').val('');
@@ -562,6 +563,14 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         };
     },
     
+    /*
+    *  Clear items
+    */
+    clear: function() {
+        this.options['has_selected'] = false;
+        $('#' + this.item_list_id).empty();
+    },
+    
     enable: function() {
         this.set_enabled(true);
     },
@@ -798,6 +807,68 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                 
             });
         }, //end of get_data
+        
+        /*
+          Perform operation on mongodb
+          params:
+              options: dictionary with options. Available options depend on the operation 
+                  operation: name of the operations
+                  subject: one of: server, database, collection, document
+                  callback: function to perform when operation is complete
+                  context: context object passed to callback
+                  
+        */
+        
+        operation : function(options) {
+            if (!('operation' in options) || !('subject' in options)) {
+                throw 'operation: missing params';
+            }
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/cmd/';
+            var data = {};
+            switch(options['subject']) {
+                case 'server': 
+                    switch(options['operation']) {
+                        case 'create_database':
+                            data['cmd'] = 'create_database';
+                            data['database_name'] = options['database_name'];
+                        break;
+                        case 'drop_database':
+                            data['cmd'] = 'drop_database';
+                            data['database_name'] = options['database_name'];
+                        break;
+                        default: throw ('operation: incorrect params');
+                    }
+                    break;
+                case 'database': 
+                    switch(options['operation']) {
+                        case 'create_collection':
+                            data['cmd'] = 'create_collection';
+                            data['database'] = options['database']
+                            data['collection_name'] = options['collection_name'];
+                        break;
+                        case 'drop_collection':
+                            data['cmd'] = 'drop_collection';
+                            data['database'] = options['database']
+                            data['collection_name'] = options['collection_name'];
+                        break;
+                        default: throw ('operation: incorrect params');
+                    }
+                    break;
+                    
+                default: throw ('operation: incorrect params');
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: options['callback'],
+                data: data,
+                dataType: 'json',
+                context: ('context' in options) ? options['context'] : null,
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert('get_data failed status' + textStatus + ' error:' + errorThrown);
+                },
+            });
+        },
 
    signal: function(signal_name, signal_source, signal_data ) {
         if (signal_name == 'database_selected')
