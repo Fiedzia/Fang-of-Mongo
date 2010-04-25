@@ -5,12 +5,15 @@ TODO list (varius bugs, tweaks and ideas)
 
   - Binary and Code data types are not supported by python json_utility
    (the only way to use them is to traverse json and manually replace Binary/Code objects)
-  - properly discover list of sort candidates from json properly
+  - Regular exression type g flag is ommited by python driver ( because it doesn't exist in python )
+  - properly discover list of sort candidates from json structure
   - introduce some menu interface, currently ordering is now unpredictable and plugins just mess with dom
   - document edition:
-    after editing coloring of odd documents doesn't work
-    allow removing of documents
+    after editing coloring of odd documents doesn't work, also collapse/expand button ignores them
+    allow adding new / removing documents
     changing _id generates new document. Thats might require help information, some people might be surprised
+  - query builder: removing conditions clears first condition
+  - add no_collection_selected signal
 
 
   * Ideas
@@ -31,6 +34,7 @@ TODO list (varius bugs, tweaks and ideas)
   - show query execution time/data loading time
   - show index /stats info when hovering over respective buttons for longer time
   - highlight syntax when editing JSON, good editor component is here: marijn.haverbeke.nl/codemirror/
+  - when editing document, textarea should have the same height as document
 
 
 
