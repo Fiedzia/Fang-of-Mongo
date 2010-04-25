@@ -215,6 +215,41 @@ def coll_query(request, host, port, dbname, collname):
     resp['Cache-Control'] = 'no-cache'
     return resp
 
+def cmd(request, host, port):
+    """
+    From POST take:  login, password : database credentials(optional, currently ignored)
+
+         cmd: command to perform
+
+    Return json with requested data or error
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        cmd = request.POST['cmd']
+        if cmd == 'create_database':
+            db = conn[request.POST['database_name']]
+            #hack: this will actually create database if one doesn't exists
+            db.collection_names()
+        elif cmd == 'drop_database':
+            conn.drop_database(request.POST['database_name'])
+        elif cmd == 'create_collection':
+            db = conn[request.POST['database']]
+            db.create_collection(request.POST['collection_name'])
+        elif cmd == 'drop_collection':
+            db = conn[request.POST['database']]
+            db.drop_collection(request.POST['collection_name'])
+        else:
+            raise Exception('incorrect command')
+        resp = {}
+        json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
+    except (Exception), e:
+        json_response = json.dumps({'error': repr(e)})
+    finally:
+        conn.disconnect()
+        
+    resp = HttpResponse(json_response, mimetype='application/json' )
+    resp['Cache-Control'] = 'no-cache'
+    return resp
 
 def save_document(request, host, port, dbname, collname):
     """
