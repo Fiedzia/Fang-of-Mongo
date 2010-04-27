@@ -94,7 +94,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             this_obj.add_query();
         });
         $(this.table).find('.fom_query_builder_btn_del').click( function() {
-            this_obj.clear_query();
+            this_obj.del_query();
         });
         this.add_query();
 
@@ -133,7 +133,8 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
     clear_query: function() {
         var rows = $(this.table).find('tr');
 
-        if ($(rows[0]).children('td').length > 3) {
+        //if ($(rows[0]).children('td').length > 3) {
+        while ($(rows[0]).children('td').length > 3) {
                 $(rows[0]).children('td:last-child').remove();
                 $(rows[1]).children('td:last-child').remove();
                 $(rows[2]).children('td:last-child').remove();
@@ -142,6 +143,21 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
         $($(rows[0]).children('td')[2]).children('input').val('');
         $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
         $($(rows[2]).children('td')[2]).children('input').val('');
+        
+        
+    },
+    del_query: function() {
+        var rows = $(this.table).find('tr');
+
+        if ($(rows[0]).children('td').length > 3) {
+                $(rows[0]).children('td:last-child').remove();
+                $(rows[1]).children('td:last-child').remove();
+                $(rows[2]).children('td:last-child').remove();
+        }
+        
+        /*$($(rows[0]).children('td')[2]).children('input').val('');
+        $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
+        $($(rows[2]).children('td')[2]).children('input').val('');*/
         
         
     },
