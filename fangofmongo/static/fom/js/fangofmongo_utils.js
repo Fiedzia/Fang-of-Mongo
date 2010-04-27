@@ -187,8 +187,14 @@ $.widget("ui.fom_utils", {
                 resp = $('<div />').addClass('fom_ui_json_value_dict').html(function(){
                     var object_wrapper = $('<span />').html('{').add('<br/>');
                     var object_content = $(null);
+                    value_keys = [];
                     for (k in value)
+                        value_keys.push(k);
+                    value_keys.sort();
+                    for (i in value_keys)
                     {
+                        //v = value[k];
+                        k = value_keys[i]
                         v = value[k];
                         object_content = object_content.add($('<div />')
                             .addClass('fom_ui_json_key')
@@ -317,7 +323,12 @@ $.widget("ui.fom_utils", {
             .html( function(){
             
                 var doc2 = $(null);
-                for (k in document) {
+                document_keys = [];
+                for (k in document)
+                    document_keys.push(k);
+                document_keys.sort();
+                for (i in document_keys) {
+                    k = document_keys[i];
                     v = document[k];
                     doc2 = doc2.add(
                         $('<div />').addClass('fom_ui_json_key').html(
