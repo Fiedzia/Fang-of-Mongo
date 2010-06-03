@@ -249,7 +249,9 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 )
                 .append('<span>Show details</span>')
                 .append(
-                    $('<div>' +JSON.stringify(signal_data['data'], null, '  ') + '</div>').hide()
+                    //$('<div>' +JSON.stringify(signal_data['data'], null, '  ') + '</div>').hide()
+                   $('<div/>').html($('#fom_utils').fom_utils('render_json_value',signal_data['data'])).hide()
+                    
                 );
             
             
