@@ -143,6 +143,10 @@ $.widget("ui.fom_utils", {
         {
             return $('<div />').addClass('fom_ui_json_value_null').html('null');
         }
+        /*if (value == undefined)
+        {
+            return $('<div />').addClass('fom_ui_json_value_undefined').html('undefined');
+        }*/
 
         switch(value.constructor.name)
         {
@@ -187,7 +191,7 @@ $.widget("ui.fom_utils", {
                 resp = $('<div />').addClass('fom_ui_json_value_dict').html(function(){
                     var object_wrapper = $('<span />').html('{').add('<br/>');
                     var object_content = $(null);
-                    value_keys = [];
+                    var value_keys = [];
                     for (k in value)
                         value_keys.push(k);
                     value_keys.sort();
