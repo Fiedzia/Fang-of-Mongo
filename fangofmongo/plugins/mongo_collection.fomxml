@@ -62,11 +62,11 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         this.options['clear_data_on_load'] = true; //clear sort/query options when receive data
 
         $('#mongo_ui_coll_info_tabs').tabs();
-        $("#mongo_ui_coll_info_data_btn").button();
-        $('#mongo_ui_coll_info_data_expand').button({});
-        $('#mongo_ui_coll_info_data_refresh').button({});
-        $('#mongo_ui_coll_info_data_next').button();
-        $('#mongo_ui_coll_info_data_prev').button();
+        $("#mongo_ui_coll_info_data_btn").button();//.button('.widget').css('width','70px');
+        $('#mongo_ui_coll_info_data_expand').button({}).button('.widget').css('width','70px').css('height','25px');
+        $('#mongo_ui_coll_info_data_refresh').button({}).button('.widget').css('width','70px').css('height','25px');
+        $('#mongo_ui_coll_info_data_next').button().button('.widget').css('width','70px').css('height','25px');
+        $('#mongo_ui_coll_info_data_prev').button().button('.widget').css('width','70px').css('height','25px');
         $('#mongo_ui_coll_info_data_next').click(function(){ this_obj.load_next(); });
         $('#mongo_ui_coll_info_data_prev').click(function(){ this_obj.load_prev(); });
         $('#mongo_ui_coll_info_data_refresh').click(function(){

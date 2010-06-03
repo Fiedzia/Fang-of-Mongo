@@ -451,7 +451,7 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         <div id='" + this.dialog_id + "'>\
           <div style='width: 99%; height: 99%; display: table;'>\
             <div style='display: table-row; height: auto;'>\
-              <div style=' height: auto; display: table-cell;'>\
+              <div class='search_toolbox' style=' height: auto; display: table-cell;'>\
                 <input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/>\
                 <button id='" + this.search_id + "'>Search</button>\
                 <button id='" + this.clear_id + "'>Clear</button>\
@@ -476,7 +476,9 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         var clear_id = this.clear_id;
         var input_id = this.input_id;
         this.toolbox = $('#'+this_obj.dialog_id).find('.toolbox').get(0);
+        this.search_toolbox = $('#'+this_obj.dialog_id).find('.search_toolbox').get(0);
         $(this.toolbox).hide();
+        $(this.search_toolbox).hide();
      
         //dialog - item list
         $('#' + this.options['div_id'] + '_dialog').dialog({
@@ -496,11 +498,13 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         
         $('#' + this.dialog_id).hover(function(event, ui) {
             if(! this_obj.options['disabled'])
+                $(this_obj.search_toolbox).show();
                 $(this_obj.toolbox).show();
         });
         
         $('#' + this.dialog_id).mouseleave(function(event, ui) {
             //if(! this_obj.options['disabled'])
+                $(this_obj.search_toolbox).hide();
                 $(this_obj.toolbox).hide();
         });
 

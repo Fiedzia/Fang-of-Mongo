@@ -44,11 +44,8 @@ Project goals:
 
 TODO (in order of importance):
 
-  - display collection content in nicely formatted way
-  - allow to easily filter and sort data
   - make sure fom works correctly (by creating unittests and usable dataset)
   - rethinking plugin interface
-  - CRUD operations
   - collection and db operations
   - data export (html, json, csv, xml)
   - support for database credentials
