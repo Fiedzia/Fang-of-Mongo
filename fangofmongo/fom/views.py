@@ -4,10 +4,66 @@ from django.shortcuts import render_to_response
 from django.utils import simplejson as json
 
 import re
+import base64
 import pymongo
 from pymongo import json_util
 import handle_plugins
 from exceptions import CmdException
+
+
+def fix_json_output(json_obj):
+    """
+        Handle binary data in output json, because pymongo cannot encode them properly (generating UnicodeDecode exceptions)
+    """
+    def _fix_json(d):
+        if d in [None, [], {}]: #if not d: breaks empty Binary
+            return d
+        data_type = type(d)
+        if data_type == list:
+            data = []
+            for item in d:
+                data.append(_fix_json(item))
+            return data
+        elif data_type == dict:
+            data = {}
+            for k in d:
+                data[_fix_json(k)] = _fix_json(d[k])
+            return data
+        elif data_type == pymongo.binary.Binary:
+            ud = u''.join([unichr(ord(s)) for s in d])
+            return { '$binary' : ud, '$type': d.subtype }
+        else:
+            return d
+
+    return _fix_json(json_obj)
+
+def fix_json_input(json_obj):
+    """
+        Handle binary data in input json, because pymongo cannot decode them properly (leaving $binary as string)
+    """
+    def _fix_json(d):
+        if d in [None, [], {}]: #if not d: breaks empty Binary
+            return d
+        data_type = type(d)
+        if data_type == list:
+            data = []
+            for item in d:
+                data.append(_fix_json(item))
+            return data
+        elif data_type == dict:
+            data = {}
+            if '$binary' in d: #base64 encoded data
+                return pymongo.binary.Binary(base64.decodestring(d['$binary'].encode('ascii')), d['$type'])
+            else:
+                for k in d:
+                    data[_fix_json(k)] = _fix_json(d[k])
+            return data
+        else:
+            return d
+
+    return _fix_json(json_obj)
+
+
 
 #login view
 def start_page(request):
@@ -205,8 +261,12 @@ def coll_query(request, host, port, dbname, collname):
         if sort:
             cur = cur.sort(sort)
         resp = [a for a in cur]
-        json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
+        json_response = json.dumps({'data':fix_json_output(resp)}, default=pymongo.json_util.default)
+
     except (Exception), e:
+        print e
+        import traceback
+        traceback.print_stack()
         json_response = json.dumps({'error': repr(e)})
     finally:
         conn.disconnect()
@@ -263,11 +323,13 @@ def save_document(request, host, port, dbname, collname):
         db = conn[dbname]
         coll = db[collname];
         resp = {}
-        document = json.loads(request.POST['document'], object_hook=json_util.object_hook)
+        document = fix_json_input(json.loads(request.POST['document'], object_hook=json_util.object_hook))
         _id =  coll.save(document)
         json_response = json.dumps({'_id':_id}, default=pymongo.json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
+        import traceback
+        traceback.print_stack()
     finally:
         conn.disconnect()
         

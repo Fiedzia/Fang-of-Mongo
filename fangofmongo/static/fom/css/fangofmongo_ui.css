@@ -90,7 +90,7 @@ h1 { font-size: 1.2em; margin: .6em 0; }
 .fom_ui_json_value_number { color: #0066B3; }
 .fom_ui_json_value_boolean { color: #990099;}
 .fom_ui_json_value_date { color: #930000; }
-.fom_ui_json_value_regex { display: inline; }
+.fom_ui_json_value_regex, .fom_ui_json_value_binary { display: inline; }
 
 .fom_ui_json_value_dict {
     margin-left:20px;

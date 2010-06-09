@@ -6,6 +6,10 @@ var ObjectId = function(s) {
     return {$oid: s};
 };
 
+var BinData = function(data_type, data) {
+    return {$binary: data, $type: dat_type }
+};
+
 /*
  Fom jquery extensions
 */
@@ -178,7 +182,7 @@ $.widget("ui.fom_utils", {
                 if ('$date' in value) {
                     var date = new Date(value['$date']);
                     return $('<div />').addClass('fom_ui_json_value_date').html(this.formatDate( date , "yyyy-MM-dd HH:mm:ss.SSS"));
-                    }
+                }
                     
                 if ('$oid' in value)
                     return $('<div />').addClass('fom_ui_json_value_oid').html('ObjectId("' + value['$oid'] + '")');
@@ -186,7 +190,14 @@ $.widget("ui.fom_utils", {
                 if ('$regex' in value) {
                     //var re_options = '';
                     return $('<div />').addClass('fom_ui_json_value_regex').html($('#fom_utils').fom_utils('escape_html','/' + value['$regex'] + '/' + value['$options']));
-                    }
+                }
+
+                if ('$binary' in value) {
+                    //return $('<div />').addClass('fom_ui_json_value_binary').html('BinData(' + value['$type'] + ', ' +  JSON.stringify(value['$binary']) + ')');
+                    return $('<div />').addClass('fom_ui_json_value_binary').html('BinData(' + value['$type'] + ', "' +  Base64.encode(value['$binary']) + '")');
+
+                }
+
                     
                 resp = $('<div />').addClass('fom_ui_json_value_dict').html(function(){
                     var object_wrapper = $('<span />').html('{').add('<br/>');
@@ -421,6 +432,8 @@ $.widget("ui.fom_utils", {
                         if (obj.multiline) re_options += 'm';
                         return {'$regex' : obj.source, '$options': re_options}
                     }
+                //case("BinData"):
+                //    return {'$binary' : obj.data, '$type' : obj.type }
                     
             }; //end switch
         
