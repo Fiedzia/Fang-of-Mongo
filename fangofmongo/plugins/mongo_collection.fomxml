@@ -342,10 +342,10 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
 
         if (this.options['clear_data_on_load'] == true) {
             this.clear_sort_options();
-            var key_dict = $('#fom_utils').fom_utils('fom_json_list_keys', data['data'] );
+            var orig_key_list = $('#fom_utils').fom_utils('fom_json_list_keys', data['data'] );
             var key_list = [];
             
-            $.each(key_dict, function(k,v) {
+            $.each(orig_key_list, function(k,v) {
                 key_list.push(v);
                 if (v != '_id') {
                     $('#mongo_ui_coll_info_data_sort_options').append("<option value='[[" + '"'+ $('#fom_utils').fom_utils('escape_html', v) + '", 1]'+']' +"'"+'>' + $('#fom_utils').fom_utils('escape_html', v) + ' ASC</option>');

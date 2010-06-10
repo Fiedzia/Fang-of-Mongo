@@ -393,7 +393,7 @@ $.widget("ui.fom_utils", {
     */
     escape_html: function(html_text) 
     {
-        return html_text.replace(/&/g,'&amp;').replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        return (''+html_text).replace(/&/g,'&amp;').replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
     },
 
 
@@ -511,15 +511,16 @@ $.widget("ui.fom_utils", {
     fom_json_list_keys: function(json_data, options) {
         var sort_keys = {};
         for(var i =0; i < json_data.length; i++) {
-            $.each(json_data[i], function(k,v) {
-                sort_keys[k] = true;
-            });
+            var doc = json_data[i];
+            for(key in doc) {
+                sort_keys[key] = true;
+            };
         };
-        var ret_sort_keys = [];
-        $.each(sort_keys, function(k,v) {
-            ret_sort_keys.push(k);
-        });
-            
+        var ret_sort_keys = new Array();
+        for(key in sort_keys) {
+            ret_sort_keys.push(key);
+        }
+        ret_sort_keys.sort();
         return ret_sort_keys;
     },
 
