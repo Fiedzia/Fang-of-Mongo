@@ -16,6 +16,7 @@
         <style type="text/css">
         #mongo_ui_coll_info_stats {white-space: pre-wrap;}
         #mongo_ui_coll_info_indexes {white-space: pre-wrap;}
+
         #mongo_ui_coll_info_data_expand { display: block }
         #mongo_ui_coll_info_data_limit {width: 30px}
         #mongo_ui_coll_info_data_page  {width: 30px}
@@ -38,7 +39,8 @@
         #mongo_ui_coll_info_indexes {height: 98%;}
 
         #mongo_ui_coll_info_paginator {height: auto;}
-        #mongo_ui_coll_info_data_container {height: 80%; overflow: auto;}
+        #mongo_ui_coll_info_data_area {height: 90%; overflow: auto;}
+        #mongo_ui_coll_info_data_container {}
         
         .mongo_ui_coll_info_stats_name { }
         .mongo_ui_coll_info_stats_value { font-weight: bold; margin-left: 10px; }
@@ -333,7 +335,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
         
         //format and display received data
         if (data['data'].length == 0) {
-                $('#mongo_ui_coll_info_data_container').html('There are no records matchin query');
+                $('#mongo_ui_coll_info_data_container').html('There are no records matching query');
         } else {
             $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
             $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
@@ -407,10 +409,17 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                 </ul>
                 <div id="mongo_ui_coll_info_tab_data">
                     <div id='mongo_ui_coll_info_data'>
-                            
+
                         <div id='mongo_ui_coll_info_paginator'>
                             <table>
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
+                                    </td>
+                                    <td>
+                                        <button id="mongo_ui_coll_info_data_refresh" >Refresh</button>
+                                    </td>
+
                                     <td>
                                         <button id="mongo_ui_coll_info_data_prev">Prev</button>
                                     </td>
@@ -424,6 +433,12 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                                         <input id="mongo_ui_coll_info_data_limit" type="text" value="10"/>
                                     </td>
                                     <td>
+                                        Page:
+                                    </td>
+                                    <td>
+                                        <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
+                                    </td>
+                                    <td>
                                         Sort:
                                     </td>
                                     <td>
@@ -434,33 +449,28 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                                             <option value='[["_id",-1]]'>_id DESC</option>
                                       </select>
                                     </td>
-                                    <td rowspan="2"><div id="mongo_ui_coll_info_query_builder"></div>
-                                    </td>
                                 </tr>
+                            </table>
+                            <table>
+
+
+
+
+
+
                                 <tr>
-                                    <td>
-                                        <input type="checkbox" id="mongo_ui_coll_info_data_expand" /><label for="mongo_ui_coll_info_data_expand">Expand</label>
-                                    </td>
-                                    <td>
-                                        <button id="mongo_ui_coll_info_data_refresh" >Refresh</button>
-                                    </td>
-                                    <td>
-                                        Page:
-                                    </td>
-                                    <td>
-                                        <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
-                                    </td>
-                                    <td colspan="2">
-                                        <input id="mongo_ui_coll_info_data_sort" type="text" value=""/>
-                                    </td>
-                                    <td>
+                                    <td colspan="9">
                                     </td>
                                 </tr>
+
+
                             </table>
                             
                         </div>
-
-                        <div id='mongo_ui_coll_info_data_container'></div>
+                        <div id="mongo_ui_coll_info_data_area">
+                            <div id="mongo_ui_coll_info_query_builder"></div>
+                            <div id='mongo_ui_coll_info_data_container'></div>
+                        </div>
                     </div>
                 </div>
                 <div id="mongo_ui_coll_info_tab_stats">

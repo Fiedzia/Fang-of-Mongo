@@ -68,6 +68,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
         var defaults = {
             autocomplete: true,
             completion_source: [],
+            layout: 'vertical', //horizontal or vertical
         };
         this.options  = $.extend({}, defaults, this.options);
 
@@ -75,20 +76,24 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
         var this_obj = this;
         this.div = $('#' + this.options['div_id']);
         $(this.div).addClass('fom_query_builder');
-        $(this.div).append('<table>\
-                                <tr>\
-                                    <td>Field</td>\
-                                    <td><button class="fom_query_builder_btn_add">+</button></td>\
-                                </tr>\
-                                <tr>\
-                                    <td>Condition</td>\
-                                    <td><button class="fom_query_builder_btn_del">-</button></td>\
-                                </tr>\
-                                <tr>\
-                                    <td>Value</td>\
-                                    <td></td>\
-                                </tr>\
-                            </table>');
+        if(this.options['layout'] == 'horizontal') {
+            $(this.div).append('<table>\
+                                    <tr>\
+                                        <td>Field</td>\
+                                        <td><button class="fom_query_builder_btn_add">+</button></td>\
+                                    </tr>\
+                                    <tr>\
+                                        <td>Condition</td>\
+                                        <td><button class="fom_query_builder_btn_del">-</button></td>\
+                                    </tr>\
+                                    <tr>\
+                                        <td>Value</td>\
+                                        <td></td>\
+                                    </tr>\
+                                </table>');
+        } else { //vertical layout
+            $(this.div).append('<table><tr><td><button class="fom_query_builder_btn_add">+</button></td><td><button class="fom_query_builder_btn_del">-</button></td></tr></table>');
+        };
         this.table = $(this.div).children()[0];
         $(this.table).find('.fom_query_builder_btn_add').click( function() {
             this_obj.add_query();
@@ -101,63 +106,86 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
     },
     
     add_query: function() {
-        var rows = $(this.table).find('tr');
-        //$(rows[0]).append('<td><input type="text" value="" class="fom_query_builder_field_name"></td>');
-        $(rows[0]).append($('<td />').html($('<input type="text" value="" class="fom_query_builder_field_name"/>').autocomplete({source:this.options.completion_source})) );
-        $(rows[1]).append('<td>\
-                               <select class="fom_query_builder_field_condition">\
-                                   <option value="_ignore">(ignore)</option>\
-                                   <option value="$exists">exists</option>\
-                                   <option value="$nexists">does not exists</option>\
-                                   <option value="$equals">equals</option>\
-                                   <option value="$ne">is not equal</option>\
-                                   <option value="$gt">greather</option>\
-                                   <option value="$gte">greather or equal</option>\
-                                   <option value="$lt">lower</option>\
-                                   <option value="$lte">lower or equal</option>\
-                                   <option value="$in">is any of</option>\
-                                   <option value="$nin">is not any of</option>\
-                                   <option value="$all">contains all of</option>\
-                                   <option value="$size">is of size</option>\
-                                   <option value="$type">is of type</option>\
-                                   <option value="$re">matches regular expression</option>\
-                                   <option value="$where">matches condition ($where)</option>\
-                               </select>\
-                           </td>');
-                               
-        $(rows[2]).append('<td><input type="text" class="fom_query_builder_field_value"/></td>');
-        
+        var qb_field_condition = $('\
+                            <select class="fom_query_builder_field_condition">\
+                                <option value="_ignore">(ignore)</option>\
+                                <option value="$exists">exists</option>\
+                                <option value="$nexists">does not exists</option>\
+                                <option value="$equals">equals</option>\
+                                <option value="$ne">is not equal</option>\
+                                <option value="$gt">greather</option>\
+                                <option value="$gte">greather or equal</option>\
+                                <option value="$lt">lower</option>\
+                                <option value="$lte">lower or equal</option>\
+                                <option value="$in">is any of</option>\
+                                <option value="$nin">is not any of</option>\
+                                <option value="$all">contains all of</option>\
+                                <option value="$size">is of size</option>\
+                                <option value="$type">is of type</option>\
+                                <option value="$re">matches regular expression</option>\
+                                <option value="$where">matches condition ($where)</option>\
+                            </select>\
+        ');
+        var qb_field_name = $('<input type="text" value="" class="fom_query_builder_field_name"/>').autocomplete({source:this.options.completion_source});
+        var qb_field_value = $('<input type="text" class="fom_query_builder_field_value"/>');
+
+        if(this.options['layout'] == 'horizontal') {
+            var rows = $(this.table).find('tr');
+            $(rows[0]).append($('<td />').html(qb_field_name));
+            $(rows[1]).append($('<td></td>').append(qb_field_condition));
+            $(rows[2]).append($('<td></td>').append(qb_field_value));
+        } else { //vertical layout
+            var new_row = $('<tr></tr>').html(
+                 $('<td/>').html('Field')
+                     .add( $('<td/>').html(qb_field_name))
+                     .add( $('<td/>').html(qb_field_condition))
+                     .add( $('<td/>').html(qb_field_value))
+             );
+            //if($(this.table).find('tr').length == 0)
+                //$(this.table).html(new_row);
+            //.last().prev().after();
+            $(this.table).find('tr').last().before(new_row);
+            //var last_row = rows.last().prev
+        }
         this.build_query();
 
     },
     clear_query: function() {
-        var rows = $(this.table).find('tr');
+        if(this.options['layout'] == 'horizontal') {
+            var rows = $(this.table).find('tr');
+            while ($(rows[0]).children('td').length > 3) {
+                    $(rows[0]).children('td:last-child').remove();
+                    $(rows[1]).children('td:last-child').remove();
+                    $(rows[2]).children('td:last-child').remove();
+            }
 
-        //if ($(rows[0]).children('td').length > 3) {
-        while ($(rows[0]).children('td').length > 3) {
-                $(rows[0]).children('td:last-child').remove();
-                $(rows[1]).children('td:last-child').remove();
-                $(rows[2]).children('td:last-child').remove();
+            $($(rows[0]).children('td')[2]).children('input').val('');
+            $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
+            $($(rows[2]).children('td')[2]).children('input').val('');
+        } else { //vertical layout
+            while(rows = $(this.table).find('tr'), rows.length > 2) {
+                rows.last().prev().remove();
+            }
+            $(rows.last().prev().children('td')[1]).children('input').val('');
+            $(rows.last().prev().children('td')[2]).children('select').get(0).selectedIndex=0;
+            $(rows.last().prev().children('td')[3]).children('input').val('');
         }
-        
-        $($(rows[0]).children('td')[2]).children('input').val('');
-        $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
-        $($(rows[2]).children('td')[2]).children('input').val('');
-        
-        
+
     },
     del_query: function() {
-        var rows = $(this.table).find('tr');
+        if(this.options['layout'] == 'horizontal') {
+            var rows = $(this.table).find('tr');
 
-        if ($(rows[0]).children('td').length > 3) {
-                $(rows[0]).children('td:last-child').remove();
-                $(rows[1]).children('td:last-child').remove();
-                $(rows[2]).children('td:last-child').remove();
+            if ($(rows[0]).children('td').length > 3) {
+                    $(rows[0]).children('td:last-child').remove();
+                    $(rows[1]).children('td:last-child').remove();
+                    $(rows[2]).children('td:last-child').remove();
+            }
+        } else { //vertical layout
+            if($(this.table).find('tr').length > 2)
+                $(this.table).find('tr').last().prev().remove();
         }
         
-        /*$($(rows[0]).children('td')[2]).children('input').val('');
-        $($(rows[1]).children('td')[2]).children('select').get(0).selectedIndex=0;
-        $($(rows[2]).children('td')[2]).children('input').val('');*/
         
         
     },
@@ -173,14 +201,20 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             };
             return q;
         }*/
+        
+        var field_names = $(this.table).find('.fom_query_builder_field_name');
+        var field_conditions = $(this.table).find('.fom_query_builder_field_condition');
+        var field_values = $(this.table).find('.fom_query_builder_field_value');
+        
         var rows = $(this.table).find('tr');
 
         var query = {};
-        for(var i = 2; i< $(rows[0]).children('td').length; i++)
+        for(var i=0; i<field_names.length; i++)
         {
-            var field = $($(rows[0]).children('td')[i]).children('input').val();
-            var condition = $($(rows[1]).children('td')[i]).children('select').val();
-            var value = $($(rows[2]).children('td')[i]).children('input').val();
+            var field = $(field_names[i]).val();
+            var condition = $(field_conditions[i]).val();
+            var value = $(field_values[i]).val();
+            
             try {
                 value = $('#fom_utils').fom_utils('json_to_strict', eval('' + value));
              } catch(e) {
