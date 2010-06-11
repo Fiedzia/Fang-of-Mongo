@@ -317,26 +317,26 @@ $.widget("ui.fom_utils", {
                                         },
                                         context: this
                                         }
-                                        
+
                                     )
-                                    
-                                    
-                                    
+
+
+
                                     } catch(e) {
                                         alert('error:' + e); //FIXME:add general function for error handling and displaying
                                         throw(e);
                                     }
-                                    
+
                                 }).add($('<button>Discard</button>').click(function(){
                                     this_obj.get_end_render_document(document['_id'] ,$(div_obj));
                                 }))
                             ))
                         },
-                });                                                 
+                });
 
             })
             .html( function(){
-            
+
                 var doc2 = $(null);
                 document_keys = [];
                 for (k in document)
@@ -355,7 +355,7 @@ $.widget("ui.fom_utils", {
                     doc2 = doc2.add($('<br/>'));
                 };
                 return doc2;
-            
+
             }));
             return doc;
         })
@@ -371,20 +371,20 @@ $.widget("ui.fom_utils", {
 
         if (!options) options = $.extend({}, options );
         var this_obj = this;
-        
+
         var resp = $('<div />').addClass('fom_ui_json_data').html( function () {
 
             var documents = $(null);
             $.each(json_data_array, function(array_index,document){
                 documents = documents.add(this_obj.format_mongo_json_document(document, options));
-                
-                
+
+
 
             })
             return documents;
-        
+
         });
-        
+
         return resp;
     },
 

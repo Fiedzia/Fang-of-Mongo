@@ -123,29 +123,50 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                                 <option value="$size">is of size</option>\
                                 <option value="$type">is of type</option>\
                                 <option value="$re">matches regular expression</option>\
+                                <option value="$elemMatch">matches element</option>\
                                 <option value="$where">matches condition ($where)</option>\
                             </select>\
         ');
-        var qb_field_name = $('<input type="text" value="" class="fom_query_builder_field_name"/>').autocomplete({source:this.options.completion_source});
+        var qb_field_name = $('<input type="text" value="" class="fom_query_builder_field_name"/>')
+            .autocomplete({ minLength:0, source:this.options.completion_source})
+            .css('display','inline');
+        var qb_field_btn = $("<button>&nbsp;</button>")
+            .attr("tabIndex", -1)
+            .attr("title", "Show all field names")
+            .button({
+                    icons: {
+                        primary: "ui-icon-triangle-1-s"
+                    },
+                    text: false
+                }).removeClass("ui-corner-all")
+                .addClass("ui-corner-right ui-button-icon")
+                .click(function() {
+                    // close if already visible
+                    if (qb_field_name.autocomplete("widget").is(":visible")) {
+                        qb_field_name.autocomplete("close");
+                        return;
+                    }
+                    // pass empty string as value to search for, displaying all results
+                    qb_field_name.autocomplete("search", "");
+                    qb_field_name.focus();
+                });
+
+
         var qb_field_value = $('<input type="text" class="fom_query_builder_field_value"/>');
 
         if(this.options['layout'] == 'horizontal') {
             var rows = $(this.table).find('tr');
-            $(rows[0]).append($('<td />').html(qb_field_name));
+            $(rows[0]).append($('<td />').html($(qb_field_name).add(qb_field_btn)));
             $(rows[1]).append($('<td></td>').append(qb_field_condition));
             $(rows[2]).append($('<td></td>').append(qb_field_value));
         } else { //vertical layout
             var new_row = $('<tr></tr>').html(
                  $('<td/>').html('Field')
-                     .add( $('<td/>').html(qb_field_name))
+                     .add( $('<td/>').html($(qb_field_name).add(qb_field_btn)))
                      .add( $('<td/>').html(qb_field_condition))
                      .add( $('<td/>').html(qb_field_value))
              );
-            //if($(this.table).find('tr').length == 0)
-                //$(this.table).html(new_row);
-            //.last().prev().after();
             $(this.table).find('tr').last().before(new_row);
-            //var last_row = rows.last().prev
         }
         this.build_query();
 
@@ -216,7 +237,8 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             var value = $(field_values[i]).val();
             
             try {
-                value = $('#fom_utils').fom_utils('json_to_strict', eval('' + value));
+                if (value != "")
+                value = $('#fom_utils').fom_utils('json_to_strict', eval('res=' + value));
              } catch(e) {
                  alert('query parsing error:' + e + ' for value:' + value )
                  throw(e);
@@ -281,24 +303,31 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                     q[field] = value;//{$regex:value};
                     $.extend(true, query, q);
                     break;
+                case '$elemMatch':
+                    //alert('val:' + JSON.stringify(value));
+                    q = {}
+                    q[field] = {$elemMatch: value};
+                    //query[field] = q;
+                    $.extend(true, query, q);
+                    break;
                 case '$where':
                     q = {$where: value};
                     $.extend(true, query, q);
                     break;
-                    
+
             };
-            
+
         };
         //alert(JSON.stringify(query));
         return query;
     },
-    
+
     /*
         pass array of values to field name autocomplete widget
     */
     completion_source: function(completions) {
         this.options.completion_source = completions;
-        $(this.table).find('tr td input.fom_query_builder_field_name').autocomplete({source: completions});
+        $(this.table).find('tr td input.fom_query_builder_field_name').autocomplete({minLength:0, source: completions});
     },
 
 }); 
