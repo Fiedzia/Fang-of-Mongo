@@ -37,6 +37,8 @@
         #mongo_ui_coll_info_data {height: 98%;}
         #mongo_ui_coll_info_stats {height: 98%;}
         #mongo_ui_coll_info_indexes {height: 98%;}
+        
+        #mongo_ui_coll_info_paginator table tr td.label {vertical-align: middle; }
 
         #mongo_ui_coll_info_paginator {height: auto;}
         #mongo_ui_coll_info_data_area {height: 90%; overflow: auto;}
@@ -164,7 +166,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
                 $(dialog_id).dialog('isOpen')? $(dialog_id).dialog('close') : $(dialog_id).dialog('open');
             }
         );
-        $('#mongo_ui_coll_info_paginator table').find('td').css('vertical-align', 'top');
+        //$('#mongo_ui_coll_info_paginator table').find('td').css('vertical-align', 'top');
         if (this.options.disabled) {
             this.disable();
      };
@@ -332,7 +334,7 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
     data_loaded: function(data)
     {
         if ( 'error' in data ) { alert('error: ' + data['error']); return; }
-        
+
         //format and display received data
         if (data['data'].length == 0) {
                 $('#mongo_ui_coll_info_data_container').html('There are no records matching query');
@@ -340,13 +342,14 @@ Fom_coll_info = $.extend({}, $.ui.fom_plugin.prototype, {
             $('#mongo_ui_coll_info_data_container').html($('#fom_utils').fom_utils('format_mongo_json_data', data['data']));
             $('#fom_utils').fom_utils('add_json_events', $('.fom_ui_json_data').get()[0], {'expand': $('#mongo_ui_coll_info_data_expand').is(':checked')});
         };
-        
+
+        $('#mongo_ui_coll_info_data_page_count').html(data['meta']['count']);
 
         if (this.options['clear_data_on_load'] == true) {
             this.clear_sort_options();
             var orig_key_list = $('#fom_utils').fom_utils('fom_json_list_keys', data['data'] );
             var key_list = [];
-            
+
             $.each(orig_key_list, function(k,v) {
                 key_list.push(v);
                 if (v != '_id') {
@@ -426,19 +429,20 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                                     <td>
                                         <button id="mongo_ui_coll_info_data_next">Next</button>
                                     </td>
-                                    <td>
+                                    <td class="label">
                                         Per page:
                                     </td>
                                     <td>
                                         <input id="mongo_ui_coll_info_data_limit" type="text" value="10"/>
                                     </td>
-                                    <td>
+                                    <td class="label">
                                         Page:
                                     </td>
                                     <td>
                                         <input id="mongo_ui_coll_info_data_page" type="text" value="1"/>
+                                        #items: <span id="mongo_ui_coll_info_data_page_count"></span>
                                     </td>
-                                    <td>
+                                    <td class="label">
                                         Sort:
                                     </td>
                                     <td>

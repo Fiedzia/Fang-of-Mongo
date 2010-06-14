@@ -30,7 +30,7 @@ def fix_json_output(json_obj):
                 data[_fix_json(k)] = _fix_json(d[k])
             return data
         elif data_type == pymongo.binary.Binary:
-            ud = u''.join([unichr(ord(s)) for s in d])
+            ud = base64.encodestring(d)
             return { '$binary' : ud, '$type': d.subtype }
         else:
             return d
@@ -53,7 +53,7 @@ def fix_json_input(json_obj):
         elif data_type == dict:
             data = {}
             if '$binary' in d: #base64 encoded data
-                return pymongo.binary.Binary(base64.decodestring(d['$binary'].encode('ascii')), d['$type'])
+                return pymongo.binary.Binary(base64.decodestring(d['$binary']), d['$type'])
             else:
                 for k in d:
                     data[_fix_json(k)] = _fix_json(d[k])
@@ -258,10 +258,11 @@ def coll_query(request, host, port, dbname, collname):
         if 'sort' in request.GET:
             sort = json.loads(request.GET['sort'])
         cur = coll.find(query, skip = skip, limit = limit)
+        cnt = cur.count()
         if sort:
             cur = cur.sort(sort)
         resp = [a for a in cur]
-        json_response = json.dumps({'data':fix_json_output(resp)}, default=pymongo.json_util.default)
+        json_response = json.dumps({'data':fix_json_output(resp), 'meta': {'count': cnt}}, default=pymongo.json_util.default)
 
     except (Exception), e:
         print e

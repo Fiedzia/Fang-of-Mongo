@@ -194,7 +194,7 @@ $.widget("ui.fom_utils", {
 
                 if ('$binary' in value) {
                     //return $('<div />').addClass('fom_ui_json_value_binary').html('BinData(' + value['$type'] + ', ' +  JSON.stringify(value['$binary']) + ')');
-                    return $('<div />').addClass('fom_ui_json_value_binary').html('BinData(' + value['$type'] + ', "' +  Base64.encode(value['$binary']) + '")');
+                    return $('<div />').addClass('fom_ui_json_value_binary').html('BinData(' + value['$type'] + ', "' +  value['$binary'] + '")');
 
                 }
 
