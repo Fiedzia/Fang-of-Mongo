@@ -85,7 +85,7 @@ def ui_page(request, host, port):
     
     try:
         conn = pymongo.Connection(host = host, port = int(port))
-        build_info = conn['admin'].command("buildinfo")
+        build_info = conn['admin'].command({"buildinfo": 1})
     #except:
     #    pass
     finally:
@@ -170,7 +170,7 @@ def db_stats(request, host, port, dbname):
     try:
         conn = pymongo.Connection(host = host, port = int(port))
         db = conn[dbname]
-        resp = db.command('dbstats')
+        resp = db.command({'dbstats': 1})
         json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
