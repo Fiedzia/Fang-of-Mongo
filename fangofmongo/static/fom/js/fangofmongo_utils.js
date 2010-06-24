@@ -112,6 +112,41 @@ $.widget("ui.fom_utils", {
     },
 
     /*
+         Filter list
+             params:
+                search
+                    text to search
+                method
+                    either null  or 're'
+                    if 're' then search is treated as text containing regular expression
+             
+    */
+    filter_list:function(item_list, search, method)
+    {
+        var new_list = Array();
+        if(search) {
+            if (method == 're') {
+                var re = new RegExp(search, "i");
+                for(var i = item_list.length-1; i>=0; i--) {
+                    if(r.test(item_list[i])) {
+                        new_list.push(item_list[i]);
+                    }
+                }
+            } else {
+                for(var i = item_list.length-1; i>=0; i--) {
+                    if(item_list[i].toLowerCase().indexOf( search.toLowerCase() ) != -1 ) {
+                        new_list.push(item_list[i]);
+                    }
+                }
+            }
+        } else
+            return item_list;
+
+        return new_list;
+    },
+
+
+    /*
     * add event handlers to dom resulted from call to format_mongo_json_data
     * params:
     *   node: dom node (class: fom_ui_json_data)

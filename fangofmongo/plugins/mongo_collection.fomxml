@@ -453,6 +453,9 @@ $(window).load( function() {$('#mongo_ui_header_tools_coll_info').fom_plugin_col
                                             <option value='[["_id",-1]]'>_id DESC</option>
                                       </select>
                                     </td>
+                                    <td>
+                                      <input type="text" id="mongo_ui_coll_info_data_sort" value=""/>
+                                    </td>
                                 </tr>
                             </table>
                             <table>

@@ -230,6 +230,36 @@ def coll_stats(request, host, port, dbname, collname):
     resp['Cache-Control'] = 'no-cache'
     return resp
 
+
+
+#@auth_required
+def db_run_command(request, host, port, dbname):
+    """
+    From GET take:  login, password : database credentials(optional, currently ignored)
+         cmd:
+             command to perform, in json format
+
+    Excute command again given database.
+    """
+    try:
+        conn = pymongo.Connection(host = host, port = int(port))
+        db = conn[dbname]
+        cmd = json.loads(request.GET['cmd'], object_hook=json_util.object_hook)
+        resp = db.command(cmd)
+        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+    except (Exception), e:
+        json_response = json.dumps({'error': repr(e)})
+        import traceback
+        traceback.print_stack()
+    finally:
+        conn.disconnect()
+        
+    resp = HttpResponse(json_response, mimetype='application/json')
+    resp['Cache-Control'] = 'no-cache'
+    return resp
+
+
+
 #@auth_required
 def coll_query(request, host, port, dbname, collname):
     """

@@ -80,11 +80,11 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
             $(this.div).append('<table>\
                                     <tr>\
                                         <td>Field</td>\
-                                        <td><button class="fom_query_builder_btn_add">+</button></td>\
+                                        <td><button class="fom_query_builder_btn_add" title="add condition">+</button></td>\
                                     </tr>\
                                     <tr>\
                                         <td>Condition</td>\
-                                        <td><button class="fom_query_builder_btn_del">-</button></td>\
+                                        <td><button class="fom_query_builder_btn_del" title="remove condition">-</button></td>\
                                     </tr>\
                                     <tr>\
                                         <td>Value</td>\
@@ -92,7 +92,7 @@ Fom_query_builder = $.extend({}, $.ui.fom_object.prototype,{
                                     </tr>\
                                 </table>');
         } else { //vertical layout
-            $(this.div).append('<table><tr><td><button class="fom_query_builder_btn_add">+</button></td><td><button class="fom_query_builder_btn_del">-</button></td></tr></table>');
+            $(this.div).append('<table><tr><td><button class="fom_query_builder_btn_add" title="add condition">+</button></td><td><button class="fom_query_builder_btn_del" title="remove condition">-</button></td></tr></table>');
         };
         this.table = $(this.div).children()[0];
         $(this.table).find('.fom_query_builder_btn_add').click( function() {
@@ -513,19 +513,19 @@ Fom_item_list = $.extend({}, $.ui.fom_object.prototype,{
         $('#' + this.options['div_id']).append("\
         <div id='" + this.dialog_id + "'>\
           <div style='width: 99%; height: 99%; display: table;'>\
-            <div style='display: table-row; height: auto;'>\
-              <div class='search_toolbox' style=' height: auto; display: table-cell;'>\
-                <input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/>\
-                <button id='" + this.search_id + "'>Search</button>\
-                <button id='" + this.clear_id + "'>Clear</button>\
-              </div>\
-            </div>\
             <div style='display: table-row;  height: auto;'>\
               <div style=' display: table-cell; height: 99%; '>\
                 <div class='fom_ui_note'></div>\
                 <div class='fom_ui_list_items'>\
                   <div style='width: 99%;' id='" + this.item_list_id + "'></div>\
                 </div>\
+              </div>\
+            </div>\
+            <div style='display: table-row; height: auto;'>\
+              <div class='search_toolbox' style=' height: auto; display: table-cell;'>\
+                <input type='text' name='" + this.input_id +"' id='" + this.input_id + "'/>\
+                <button id='" + this.search_id + "'>Search</button>\
+                <button id='" + this.clear_id + "'>Clear</button>\
               </div>\
             </div>\
             <div style='display: table-row; height: auto;'>\
@@ -703,22 +703,22 @@ $.widget("ui.fom_ui_list", Fom_item_list);
             class which allows to access mongodb via ajax calls
 */
 
-Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {    
+Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
 
         _init: function() {
             $('#mongo_ui_header_tools_bus').fom_bus('add_listener', this);
-        
+
             //this.host = null;
             //this.port = null;
             //this.collection = null;
             //this.database = null; },
-       },   
+       },
 
         // process server response to exec_cmd
         process_response: function(caller_id, data) {
             caller_id.process_response(data);
         }, // end of process_reponse
-        
+
         /*  //this is intended to be use for console plugin
         exec_cmd: function(console_obj, cmd){
             var url = '/fangofmongo/rest/mongo/cmd/';
@@ -726,28 +726,52 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             var my_console = this;
 
             $.post(url, {'cmd':'help'}, function(data){ my_console.process_response(caller_id, data); }, "json");
-            
+
         }, //end of exec_cmd:*/
-        
+
+
+        /*
+         *  run command against database
+         *  params:
+         *      command: Object with command to perform
+         */
+        run_command: function(database, command, callback){
+            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
+            url += 'database/' + encodeURIComponent(database) + '/cmd/'
+            $.getJSON( url,
+                {cmd:JSON.stringify(command)},
+                function(data){
+                    if ( 'error' in data ) { alert('error: ' + data['error']); return data; }
+                    //alert(JSON.stringify(data));
+                    callback(data);
+
+                });
+
+        }, //end of run_command
+
         /* Get list of databases from mongo server
            params:
                search (string, optional): text to search
                method (string, optional): search method, either null (text search) or 're' (search will be interpreted as regular expression)
         */
         get_db_list: function(search, method){
-            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
-            var params = '';
-            if (search != '') { params += 'search=' + encodeURIComponent(search); };
-            if (method != '') { params += '&method=' + encodeURIComponent(method); };
-            if (params != '') { params  = '?' + params; };
-            //alert('json url: ' + url+'databases/');            
-            $.getJSON( url + 'databases/' + params,
-                function(data, search, method){
-                
+            this.run_command('admin',  //database
+                {listDatabases : 1},   //command
+                function(data) {       // callback
                     if ( 'error' in data ) { alert('error: ' + data['error']); return; }
-                    $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
+                    var db_list = Array();
+                    for(obj in data['data']['databases'])
+                    {
+                        db_list.push(data['data']['databases'][obj]['name']);
+                    }
+                    db_list.sort();
 
-                });
+                    if(search) {
+                        db_list = $('#fom_utils').fom_utils('filter_list',db_list, search, method);
+                    }
+                    $('#mongo_ui_header_tools_bus').fom_bus('signal', 'database_list_received', this, {'search':search, 'method':method, 'data' :  db_list } );
+                }
+            );
 
         }, //end of get_db_list:
 
@@ -758,25 +782,30 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                method (string, optional): search method, either null (text search) or 're' (search will be interpreted as regular expression)
         */
         get_collection_list: function(search, method){
-            var url = '/fangofmongo/rest/mongo/' + encodeURIComponent(this.options['host']) + '/' + encodeURIComponent(this.options['port']) + '/';
-            var params = '';
-            if (search != '') { params += 'search=' + encodeURIComponent(search); };
-            if (method != '') { params += '&method=' + encodeURIComponent(method); };
-            if (params != '') { params  = '?' + params; };
-            try{
-            $.getJSON( url + 'collections/'+ encodeURIComponent(this.options['database'])  +'/' + params,
-                function(data,search, method){
-                    if ( 'error' in data ) { alert('error: ' + data['error']); return; }
-                    $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_list_received', this, {'search':search, 'method':method, 'data' :  data['data'] } );
-                        
+
+            this.get_data(
+                {$where :'this.name.indexOf("' + this.options['database'] + '.") == 0 && this.name.indexOf("$") == -1'}, 
+                {
+                    sort: [['name',1]],
+                    callback: function(data){
+                        if ( 'error' in data ) { alert('error: ' + data['error']); return; }
+                        var coll_list = Array();
+                        for(obj in data['data'])
+                            coll_list.push(data['data'][obj]['name'].substr(this.options['database'].length+1)); //strip database_name and dot
+                            if (search)
+                                coll_list =  $('#fom_utils').fom_utils('filter_list',coll_list, search, method);
+                        $('#mongo_ui_header_tools_bus').fom_bus('signal', 'collection_list_received', this, {'search':search, 'method':method, 'data' :  coll_list } );
+                    },
+                    context: this,
+                    database: this.options['database'],
+                    collection: 'system.namespaces'
                 }
-            ); //end of $.getJSON
-                
-            } catch(e) {alert(e);};
+            );
+
 
 
         }, // end of get_collection_list
-        
+
         /*
             save document
             options:
@@ -789,9 +818,9 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
             if (!("document" in options)) {
                 throw("save_document: Missing document");
             }
-                
+
             try {
-            
+
                 $.ajax({
                   type: 'POST',
                   url: url + 'collection/' + encodeURIComponent(this.options['database'])  +'/' + encodeURIComponent(this.options['collection']) + '/save_document/',
@@ -863,7 +892,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                     options: dictionary with:
                         limit: number of documents to retrieve
                         skip: how many documents ommit from results
-                        sorting: sort order, in mongo format: array of arrays ["fieldname", "ordering"], for example: [["_id",1]]
+                        sort: sort order, in mongo format: array of arrays ["fieldname", "ordering"], for example: [["_id",1]]
                         callback: callback function
                         context: context object
             returns JSON with results
@@ -876,10 +905,13 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                   limit: options['limit'],
                   skip: options['skip']
                 };
+            var db = 'database' in options ? options['database'] : this.options['database'];
+            var coll = 'collection' in options ? options['collection'] : this.options['collection'];
+                        
             if (options['sort'])
                 query_data['sort'] = JSON.stringify(options['sort']);
             $.ajax({
-                url: url + 'collection/' + this.options['database']  + '/' + this.options['collection'] + '/query/' + params,
+                url: url + 'collection/' + encodeURIComponent(db)  + '/' + encodeURIComponent(coll) + '/query/' + params,
                 dataType: 'json',
                 data: query_data,
                 success: options['callback'],
@@ -937,7 +969,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                         default: throw ('operation: incorrect params');
                     }
                     break;
-                    
+
                 default: throw ('operation: incorrect params');
             }
             $.ajax({
@@ -948,7 +980,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                 dataType: 'json',
                 context: ('context' in options) ? options['context'] : null,
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert('get_data failed status' + textStatus + ' error:' + errorThrown);
+                    alert('operation failed status: ' + textStatus + ' error:' + errorThrown);
                 },
             });
         },
