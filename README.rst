@@ -15,7 +15,7 @@ INSTALLATION:
 
  * Ubuntu 10.04:
    - requirements:
-       sudo aptitude install python-setuptools, mongodb, python-django
+       sudo aptitude install python-setuptools mongodb python-django
 
        sudo easy_install pymongo
 

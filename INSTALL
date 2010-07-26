@@ -6,7 +6,7 @@ Fang of Mongo (Fom) requirements:
 4. access to mongodb
 
 Ubuntu 10.04 shortcut for getting it all:
-    sudo aptitude install python-setuptools, mongodb, python-django
+    sudo aptitude install python-setuptools mongodb python-django
     sudo easy_install pymongo
 older releases will require adding mongodb repository,
 see http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages 
