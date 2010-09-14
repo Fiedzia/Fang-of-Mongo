@@ -763,6 +763,7 @@ Fom_mongo_ajax = $.extend({}, $.ui.fom_object.prototype, {
                 {$where :'this.name.indexOf("' + this.options['database'] + '.") == 0 && this.name.indexOf("$") == -1'}, 
                 {
                     sort: [['name',1]],
+                    limit:  100,
                     callback: function(data){
                         if ( 'error' in data ) { alert('error: ' + data['error']); return; }
                         var coll_list = Array();
