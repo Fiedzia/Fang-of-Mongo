@@ -13,11 +13,9 @@ To get the idea of code internals, see code_hacking.txt
 
 INSTALLATION:
 
- * Ubuntu 10.04:
+ * Ubuntu 10.10:
    - requirements:
-       sudo aptitude install python-setuptools mongodb python-django
-
-       sudo easy_install pymongo
+       sudo aptitude install python-setuptools mongodb python-django python-pymongo
 
   - installation:
       grab archive using either:
