@@ -5,11 +5,11 @@ Fang of Mongo (Fom) requirements:
 3. pymongo (mongo bindings for python)
 4. access to mongodb
 
-Ubuntu 10.04 shortcut for getting it all:
-    sudo aptitude install python-setuptools mongodb python-django
+Ubuntu 10.10 shortcut for getting it all:
+    sudo aptitude install python-setuptools mongodb python-django python-pymongo
+For earlier releases use easy_install to get pymongo:
     sudo easy_install pymongo
-older releases will require adding mongodb repository,
-see http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages 
+    and see http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages to install mongo
 
 If you want some sample database content to play with, 
 Fom comes with freedb.org music album collection in json format suitable to use with mongoimport,
