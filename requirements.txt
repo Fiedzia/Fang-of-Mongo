@@ -1,0 +1,2 @@
+django==1.6
+pymongo==2.6.3
