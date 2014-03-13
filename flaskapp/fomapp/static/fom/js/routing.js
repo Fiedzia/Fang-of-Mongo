@@ -7,7 +7,7 @@ fomApp.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
       when('/', {
-        templateUrl: 'main.html',
+        templateUrl: '/static/fom/templates/intro.html',
         controller: 'IndexCtrl'
       }).
       when('/newdb/', {

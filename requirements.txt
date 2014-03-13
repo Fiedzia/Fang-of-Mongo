@@ -1,2 +1,4 @@
-django==1.6
 pymongo==2.6.3
+flask==0.10.1
+#flask-appconfig==0.9
+-e git://github.com/fiedzia/flask-appconfig.git#egg=flask_appconfig

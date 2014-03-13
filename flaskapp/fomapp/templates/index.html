@@ -17,16 +17,21 @@
     <![endif]-->
 		<!-- Angular -->
 		<script src="static/angular/angular.js"></script>
-		<script src="static/fom/js/routing.js.js"></script>
+    <script src="static/angular/angular-route.js"></script>
+		<script src="static/fom/js/routing.js"></script>
 		<script src="static/fom/js/controllers.js"></script>
-
+ 
 
 
   </head>
   <body>
     <h1>Hello, world!</h1>
-
-
+    <div class="btn-group">
+        <button type="button" class="btn btn-default">About</button>
+        <button type="button" class="btn btn-default">Panel</button>
+        <button type="button" class="btn btn-default">Collection tabs</button>
+    </div>
+   <br/>
    <div ng-view></div>
 
 
