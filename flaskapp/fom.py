@@ -8,6 +8,7 @@ from flask import render_template
 from flask.ext.appconfig import AppConfig
 
 from fomapp import persistence
+from fomapp.sonutils import bson2json, json2bson
 
 def create_app(configfiles=None):
         app = Flask('fomapp')
@@ -43,7 +44,7 @@ def index():
 @app.route('/rest/servers')
 def list_servers():
     persistence = get_persistence()
-    return jsonify(servers=persistence.list_servers(sort=[]))
+    return jsonify(bson2json(dict(servers=persistence.list_servers(sort=[]))))
  
 
 @app.route('/rest/databases')
