@@ -21,7 +21,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'Warsaw/Poland'
+TIME_ZONE = 'Europe/Warsaw'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -53,9 +53,9 @@ SECRET_KEY = 'o&z6rnjmqh@gmxp#7d)p3f(4g6u^rl^6q3&iuc^cu9k6znq^8f'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -64,7 +64,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'fangofmongo.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     '',
@@ -78,7 +78,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     #'django.contrib.sessions',
     #'django.contrib.sites',
-    'fangofmongo.fom',
+    'fom',
 )
 
 FOM_PLUGIN_DIR = '%s/plugins/' % ROOT_DIRECTORY

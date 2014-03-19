@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.utils import simplejson as json
-
 import re
 import base64
+import json
+
+import bson
 import pymongo
-from pymongo import json_util
+
+from bson import json_util
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+
 import handle_plugins
 from exceptions import CmdException
 
@@ -29,7 +32,7 @@ def fix_json_output(json_obj):
             for k in d:
                 data[_fix_json(k)] = _fix_json(d[k])
             return data
-        elif data_type == pymongo.binary.Binary:
+        elif data_type == bson.binary.Binary:
             ud = base64.encodestring(d)
             return { '$binary' : ud, '$type': d.subtype }
         else:
@@ -53,7 +56,7 @@ def fix_json_input(json_obj):
         elif data_type == dict:
             data = {}
             if '$binary' in d: #base64 encoded data
-                return pymongo.binary.Binary(base64.decodestring(d['$binary']), d['$type'])
+                return bson.binary.Binary(base64.decodestring(d['$binary']), d['$type'])
             else:
                 for k in d:
                     data[_fix_json(k)] = _fix_json(d[k])
@@ -121,7 +124,7 @@ def list_databases(request, host, port):
                 else:
                     dbnames = [dbname for dbname in dbnames if request.GET['search'].lower() in dbname.lower()]
         dbnames.sort()
-        json_response = json.dumps({'data':dbnames}, default=pymongo.json_util.default)
+        json_response = json.dumps({'data':dbnames}, default=json_util.default)
     except (Exception), e:
         json_response = (json.dumps({'error': repr(e)}))
     finally:
@@ -149,7 +152,7 @@ def list_collections(request, host, port, dbname):
                 else:
                     collnames = [collname for collname in collnames if request.GET['search'].lower() in collname.lower()]
         collnames.sort()
-        json_response = json.dumps({'data':collnames}, default=pymongo.json_util.default)
+        json_response = json.dumps({'data':collnames}, default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
     finally:
@@ -171,7 +174,7 @@ def db_stats(request, host, port, dbname):
         conn = pymongo.Connection(host = host, port = int(port))
         db = conn[dbname]
         resp = db.command({'dbstats': 1})
-        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+        json_response = json.dumps({'data':resp},default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
     finally:
@@ -192,7 +195,7 @@ def coll_indexes(request, host, port, dbname, collname):
         db = conn[dbname]
         coll = db[collname];
         resp = coll.index_information()
-        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+        json_response = json.dumps({'data':resp},default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
     finally:
@@ -220,7 +223,7 @@ def coll_stats(request, host, port, dbname, collname):
         #resp['count'] = coll.count();
         #resp['indexes'] = coll.index_information()
         #resp['options'] = coll.options()
-        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+        json_response = json.dumps({'data':resp},default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
     finally:
@@ -246,7 +249,7 @@ def db_run_command(request, host, port, dbname):
         db = conn[dbname]
         cmd = json.loads(request.GET['cmd'], object_hook=json_util.object_hook)
         resp = db.command(cmd)
-        json_response = json.dumps({'data':resp},default=pymongo.json_util.default)
+        json_response = json.dumps({'data':resp},default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
         import traceback
@@ -292,7 +295,7 @@ def coll_query(request, host, port, dbname, collname):
         if sort:
             cur = cur.sort(sort)
         resp = [a for a in cur]
-        json_response = json.dumps({'data':fix_json_output(resp), 'meta': {'count': cnt}}, default=pymongo.json_util.default)
+        json_response = json.dumps({'data':fix_json_output(resp), 'meta': {'count': cnt}}, default=json_util.default)
 
     except (Exception), e:
         print e
@@ -332,7 +335,7 @@ def cmd(request, host, port):
         else:
             raise Exception('incorrect command')
         resp = {}
-        json_response = json.dumps({'data':resp}, default=pymongo.json_util.default)
+        json_response = json.dumps({'data':resp}, default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
     finally:
@@ -356,7 +359,7 @@ def save_document(request, host, port, dbname, collname):
         resp = {}
         document = fix_json_input(json.loads(request.POST['document'], object_hook=json_util.object_hook))
         _id =  coll.save(document)
-        json_response = json.dumps({'_id':_id}, default=pymongo.json_util.default)
+        json_response = json.dumps({'_id':_id}, default=json_util.default)
     except (Exception), e:
         json_response = json.dumps({'error': repr(e)})
         import traceback
@@ -381,7 +384,7 @@ def exec_cmd(request):
             raise CmdException('No command given')
         cmd = request.POST['cmd']
         if cmd == 'help':
-            json_response = json.dumps({'data': 'some help', 'type' : 'html'},  default=pymongo.json_util.default)
+            json_response = json.dumps({'data': 'some help', 'type' : 'html'},  default=json_util.default)
         
     except (CmdException,), e:
         json_response = json.dumps({'error': e.message})
